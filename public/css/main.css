@@ -1,0 +1,35 @@
+.main-bg{
+    background: url('/img/bg-small.jpg');
+    position: static;
+    background-position:center top;
+    background-size: cover, contain;
+    background-repeat: no-repeat;
+    height: 25%;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    color: aliceblue;
+}
+.header{
+    text-align: center;
+    justify-content: center;
+}
+#i-container{
+    border: solid;
+    padding-left: 12%;
+    padding-top: 0.5%;
+}
+.bottom-center {
+    position: absolute; /* Menggunakan posisi absolut untuk menempatkan teks */
+    bottom: 60%; /* Menempatkan teks di bagian bawah */
+    left: 50%; /* Posisi horizontal di tengah */
+    text-shadow: gray;
+    font-size: large;
+    transform: translateX(-50%); /* Membuat teks terpusat horizontal */
+}
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+

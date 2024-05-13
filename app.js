@@ -17,10 +17,7 @@ app.use(expresLayouts);
 app.set('layout', './layouts/main');
 app.set('view engine', 'ejs');
 
-app.get('/', function(req, res){
-    res.render('index');
-    
-});
+app.use('/', require('./server/routes/index'));
 
 app.listen(port, () => {
     console.log(`App Listening on port ${port}`);
