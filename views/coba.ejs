@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+      <thead>
+        <tr>
+          <th>Hours</th>
+          <th>CO</th>
+          <th>Lag CO</th>
+          <th>Lag PM2.5</th>
+          <th>Lag Humidity</th>
+          <th>Lag Temperature</th>
+          <th>Lag Wind Speed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% data.forEach(row => { %>
+          <tr>
+            <% row.forEach(value => { %>
+              <td><%= value %></td>
+            <% }) %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <br>
+    <table>
+      <thead>
+        <tr>
+          <th>Hasil Prediksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <%= prediction %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</body>
+</html>
