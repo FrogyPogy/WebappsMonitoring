@@ -12,15 +12,27 @@ module.exports = {
               array 1D misal [16, 3, 5, 50, 30, 2]
           */
           // Coba memuat model regresi dari database resultModel
-          const fetchModel = await resultModel.findOne().sort({ lastTrainedAt: -1 }).limit(1);
-          const coeff = fetchModel.model.flat();
-          if (fetchModel) {
-            const prediction = Math.abs(math.multiply(data, coeff));
+          const fetchModelCO = await resultModel.findOne({ name: 'modelCO' }).sort({ lastTrainedAt: -1 }).limit(1);
+          const fetchModelPM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({ lastTrainedAt: -1 }).limit(1);
+          const coeffCO = fetchModelCO.model.flat();
+          const coeffPM25 = fetchModelPM25.model.flat();
+          const dataPM25 = data;
+          // const temp = dataPM25[1];
+          // const dataPM25
+          [dataPM25[1], dataPM25[2]] = [dataPM25[2], dataPM25[1]];
+          
+          if (fetchModelCO && fetchModelPM25) {
+            const predictionCO = Math.abs(math.multiply(data, coeffCO));
+            const predictionPM25 = Math.abs(math.multiply(dataPM25, coeffPM25));
             // Simpan hasil prediksi yang baru
             await resultPrediction.create({
               jenis:"CO",
-              value: parseFloat(prediction)
+              value: parseFloat(predictionCO)
             });
+            await resultPrediction.create({
+              jenis:"PM25",
+              value: parseFloat(predictionPM25)
+            })
             return true;
           }
           else{
@@ -39,6 +51,36 @@ module.exports = {
       }
       else{
         return false;
+      }
+    },
+    firstTrainPM25: async (data) => {
+      try {
+        // Ekstrak fitur-fitur dari data
+        const formattedData = data.map((d, index) => [
+          d.hours,
+          d.value.pm25,
+          index > 0 ? data[index - 1].value.pm25 : 0, // Lag PM2.5
+          index > 0 ? data[index - 1].value.co : 0, // Lag CO
+          index > 0 ? data[index - 1].value.humidity : 0, // Lag Humidity
+          index > 0 ? data[index - 1].value.temperature : 0, // Lag Temperature
+          index > 0 ? data[index - 1].value.windSpeed : 0 // Lag Wind Speed
+        ]);
+        // Definisikan data training
+        // hours, lag_co, lag_pm25, lag_humidity, lag_temperature, lag_windspeed
+        const X = formattedData.map(row => [row[0], row[2], row[3], row[4], row[5], row[6]]); 
+        const y = formattedData.map(row => row[1]); // pm25
+        
+        const coef = module.exports.multipleLinearRegression(X,y);
+        
+        // Simpan coeff yang baru dilatih
+        await resultModel.create({
+            model: coef,
+            lastTrainedAt: new Date(),
+            name: "modelPM25"
+          });
+      }catch(error){
+        console.error('terjadi kesalahan saat melatih model regresi pm25: ',error);
+        throw error;
       }
     },
     firstTrain: async (data) => { //digunakan untuk membangun model awal dari 100 data thingspeak
@@ -63,7 +105,8 @@ module.exports = {
         // Simpan coeff yang baru dilatih
         await resultModel.create({
             model: coef,
-            lastTrainedAt: new Date()
+            lastTrainedAt: new Date(),
+            name: "modelCO"
           });
         } catch (error) {
           console.error('Terjadi kesalahan saat melatih model regresi:', error);
@@ -78,6 +121,7 @@ module.exports = {
       const coef = math.multiply(XT_X_INV, XT_y); //coefficients from model
       return coef;
     },
+    //updateRegressionModel perlu di penambahan untuk update 2 model sekaligus
     updateRegressionModel: async () => {// digunakan untuk update model baru yang memiliki data terbaru
         try {
           // Ambil 150 data terbaru dari dataset

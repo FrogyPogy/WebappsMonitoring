@@ -1,3 +1,4 @@
+const { string } = require('mathjs');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -9,6 +10,10 @@ const resultModelSchema = new Schema({
     lastTrainedAt:{
         type: Date,
         default: Date.now
+    },
+    name:{
+        type: string,
+        required: true
     }
 });
 

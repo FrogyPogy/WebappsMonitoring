@@ -7,7 +7,7 @@ const math = require('mathjs');
 module.exports = {
     start: () => {
         //melakukan scheduling setiap 5 menit utk ambil dan prediksi data
-        cron.schedule('1 * * * *', updateAndPredict);
+        cron.schedule('*/2 * * * *', updateAndPredict);
         //melakukan scheduling setiap 3 hari sekali untuk updateModel Regresi 
         // cron.schedule('0 0 */3 * *', regressionModel.updateRegressionModel);
     },
@@ -54,22 +54,23 @@ async function updateAndPredict(){
       const fieldWS = filterData.map(feed => parseFloat(feed.field5)).filter(value => !isNaN(value));
       const nextHour = (latestHour+1) % 24;
       const data = [nextHour, fieldCO, fieldPM25, fieldTemp, fieldHum, fieldWS];
+      
       const time = new Date(latestFeed.created_at);
       // data yang siap untuk diprediksi
-    
+
       const readyPredict = calcMedian(data);
+      console.log(readyPredict);
       const predictedValue = await regressionModel.predictAirPollution(readyPredict);
-      
       //menyimpan data baru kedalam dataset
       if(predictedValue){
         
         const newDataPoint = new dataset({
           value: {
-            co: readyPredict[1],
-            pm25: readyPredict[2],
-            temperature: readyPredict[3],
-            humidity: readyPredict[4],
-            windSpeed: readyPredict[5]
+            co: parseFloat(readyPredict[2]),
+            pm25: parseFloat(readyPredict[1]),
+            temperature: parseFloat(readyPredict[3]),
+            humidity: parseFloat(readyPredict[4]),
+            windSpeed: parseFloat(readyPredict[5])
           },
           timestamp: time,
           hours: latestHour

@@ -72,7 +72,22 @@ exports.initializeData = async (req, res) => {
       res.status(500).json({ error: 'Terjadi kesalahan saat menyimpan data awal' });
     }
   };
-
+exports.initializeModel = async (req, res) => {
+  try{
+    //ambil 100 data pertama dari dataset.js sebagai dataset model pertama;
+    const firstDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
+    await regressionModel.firstTrainPM25(firstDataset);
+    await regressionModel.firstTrain(firstDataset);
+    const locals = {
+      title: 'AIRMIND',
+      description:'Air Pollution Monitoring and Prediction System'
+    };
+    res.render('index', locals); //rendering index.ejs in views
+  }catch(error){
+    console.error('terjadi kesalahan: ', error);
+    res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
+  }
+};
 //DisplayAirPollutinPrediction
 exports.displayPrediction = async (req, res) => {
     //Ambil prediksi dari database resultPrediction
