@@ -16,22 +16,22 @@ module.exports = {
           const fetchModelPM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({ lastTrainedAt: -1 }).limit(1);
           const coeffCO = fetchModelCO.model.flat();
           const coeffPM25 = fetchModelPM25.model.flat();
-          const dataPM25 = data;
+          var dataPM25 = data;
           // const temp = dataPM25[1];
           // const dataPM25
           [dataPM25[1], dataPM25[2]] = [dataPM25[2], dataPM25[1]];
           
           if (fetchModelCO && fetchModelPM25) {
-            const predictionCO = Math.abs(math.multiply(data, coeffCO));
-            const predictionPM25 = Math.abs(math.multiply(dataPM25, coeffPM25));
+            const predictionCO = math.abs(math.multiply(data, coeffCO));
+            const predictionPM25 = math.abs(math.multiply(dataPM25, coeffPM25));
             // Simpan hasil prediksi yang baru
             await resultPrediction.create({
               jenis:"CO",
-              value: parseFloat(predictionCO)
+              value: parseFloat(predictionPM25)
             });
             await resultPrediction.create({
               jenis:"PM25",
-              value: parseFloat(predictionPM25)
+              value: parseFloat(predictionCO)
             })
             return true;
           }
@@ -59,8 +59,8 @@ module.exports = {
         const formattedData = data.map((d, index) => [
           d.hours,
           d.value.pm25,
-          index > 0 ? data[index - 1].value.pm25 : 0, // Lag PM2.5
           index > 0 ? data[index - 1].value.co : 0, // Lag CO
+          index > 0 ? data[index - 1].value.pm25 : 0, // Lag PM2.5
           index > 0 ? data[index - 1].value.humidity : 0, // Lag Humidity
           index > 0 ? data[index - 1].value.temperature : 0, // Lag Temperature
           index > 0 ? data[index - 1].value.windSpeed : 0 // Lag Wind Speed
