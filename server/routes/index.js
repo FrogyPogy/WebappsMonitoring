@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mainController = require('../controllers/mainController');
+const adminController = require('../controllers/adminController');
 
 /** Routes app*/
 router.get('/',mainController.homepage);
@@ -13,5 +14,8 @@ router.get('/prediction', mainController.displayPrediction);
 router.get('/data', mainController.getData);
 //Route initialisasi model pertama regresi pm25 dan co
 router.get('/initializeModel',mainController.initializeModel);
+//Route signIn
+router.get('/signIn',loginController);
+router.post('/signIn',loginController.checkAuth);
 
 module.exports = router;
