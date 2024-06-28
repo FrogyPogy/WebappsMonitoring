@@ -1,18 +1,30 @@
 .main-bg{
     background: url('/img/bg-small.jpg');
-    position: static;
+    position: relative;
     background-position:center top;
-    background-size: cover, contain;
+    z-index: 2;
+    background-size: cover;
     background-repeat: no-repeat;
-    height: 25%;
+    height: 50vh;
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
     text-align: center;
     color: aliceblue;
+   
+    
 }
 .header{
     text-align: center;
     justify-content: center;
+}
+.bg-second{
+    position: relative; /* Menggunakan posisi absolut untuk menempatkan teks */
+    z-index: 1;
+    margin-top: -20vh;
+    padding-top: 20vh;
+   
 }
 #i-container{
     border: solid;
@@ -37,6 +49,9 @@
     font-weight: 700;
     font-style: normal;
 }
+.signBtn{
+    background-color: #088395;
+}
 .info-box {
     padding: 20px;
     text-align: center;
@@ -48,6 +63,12 @@
 @media (min-width: 768px){
     .info-box + .info-box{
         margin-left: 15px;
+    }
+}
+@media (max-width:991px){
+    .sidebar{
+        background-color: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
     }
 }
 
