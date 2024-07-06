@@ -1,149 +1,135 @@
 <div class="main-bg">
-    <p class="bottom-center poppins-regular">Check Air Pollution Now</p>
+    <div class="overlay-container">
+        <h3 class="center poppins-regular">
+            Air Pollution Monitoring System untuk memonitoring kadar karbon monoksida, Polutan PM25, Suhu, Kelembaban serta digunakan sebagai prediksi kadar karbon monoksida dan polutan PM25
+        </h3>
+    </div>
+    <a href="#" class="bottom-center poppins-regular link-1">Cek Polusi Saat ini</a>
 </div>
 <br>
 <div class="container-md bg-second">
-    <h2>
-        <div class="d-flex justify-content-center mb-4">
-            <canvas id="myChart"></canvas>  
-        </div>
-        <script>
-            var myChart;
-
-            async function fetchData() {
-                try {
-                    const response = await fetch(`/data`);
-                    const data = await response.json();
-                    return data;
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            }
-
-            async function updateChart() {
-                const data = await fetchData();
-                if (data) {
-                    var labels = data.feeds.map(feed => feed.created_at);
-                    var values1 = data.feeds.map(feed => feed.field1);
-                    var values2 = data.feeds.map(feed => feed.field2);
-                    var values3 = data.feeds.map(feed => feed.field3);
-                    var values4 = data.feeds.map(feed => feed.field4);
-                    var values5 = data.feeds.map(feed => feed.field5);
-
-                    document.getElementById('coValue').innerText = values1[values1.length - 1];
-                    document.getElementById('pm25Value').innerText = values2[values2.length - 1];
-                    document.getElementById('tempValue').innerText = values3[values3.length - 1];
-                    document.getElementById('humValue').innerText = values4[values4.length - 1];
-                    
-                    if (!myChart) {
-                        var ctx = document.getElementById('myChart').getContext('2d');
-                        myChart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: labels,
-                                datasets: [{
-                                    label: 'CO',
-                                    data: values1,
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                    borderWidth: 1,
-                                    pointStyle:false,
-                                    fill: false
-                                },
-                                {
-                                    label: 'PM25',
-                                    data: values2,
-                                    backgroundColor: 'rgba(192, 75, 75, 0.2)',
-                                    borderColor: 'rgba(192, 75, 75, 1)',
-                                    borderWidth: 1,
-                                    pointStyle:false,
-                                    fill: false
-                                },
-                                {
-                                    label: 'Temperature',
-                                    data: values3,
-                                    backgroundColor: 'rgba(75, 75, 192, 0.2)',
-                                    borderColor: 'rgba(75, 75, 192, 1)',
-                                    borderWidth: 1,
-                                    pointStyle:false,
-                                    fill: false
-                                },
-                                {
-                                    label: 'Humidity',
-                                    data: values4,
-                                    backgroundColor: 'rgba(75, 192, 75, 0.2)',
-                                    borderColor: 'rgba(75, 192, 75, 1)',
-                                    borderWidth: 1,
-                                    pointStyle:false,
-                                    fill: false
-                                },
-                                {
-                                    label: 'WindSpeed',
-                                    data: values5,
-                                    backgroundColor: 'rgba(192, 192, 75, 0.2)',
-                                    borderColor: 'rgba(192, 192, 75, 1)',
-                                    borderWidth: 1,
-                                    pointStyle:false,
-                                    fill: false
-                                }]
-                            },
-                            options: {
-                                scales: {
-                                    x:{
-                                        grid:{
-                                            display:false
-                                        }
-                                    },
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        myChart.data.labels = labels;
-                        myChart.data.datasets[0].data = values1;
-                        myChart.data.datasets[1].data = values2;
-                        myChart.data.datasets[2].data = values3;
-                        myChart.data.datasets[3].data = values4;
-                        myChart.data.datasets[4].data = values5;
-                        myChart.update();
-                    }
-                }
-            }
-
-            setInterval(updateChart, 120000); // Update every 120 seconds
-            updateChart(); // Initial call
-        </script>
-    </h2>
+    <h2 class="header">Kadar setiap dua menit sekali</h2>
     <br>
-
     <!-- Kotak informasi nilai terakhir -->
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">CO</p>
-                <h3 id="coValue">-</h3>
+                <h3 id="coValue"></h3>
             </div>
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">PM25</p>
-                <h3 id="pm25Value">-</h3>
+                <h3 id="pm25Value"></h3>
             </div>
         </div>
         <div class="row justify-content-center mt-3">
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">Temperature</p>
-                <h3 id="tempValue">-</h3>
+                <h3 id="tempValue"></h3>
             </div>
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">Humidity</p>
-                <h3 id="humValue">-</h3>
+                <h3 id="humValue"></h3>
             </div>
         </div>
         <div class="text-center mt-5">
             <a class="btn btn-outline-success me-2" href="/prediction">View Prediction</a>
         </div>
     </div>
+    <br>
+    
+    <div class="d-flex justify-content-center mb-4"><!--main chart-->
+        <canvas id="myChart1"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart CO-->
+        <canvas id="myChart2"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart PM25-->
+        <canvas id="myChart3"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart Temperature-->
+        <canvas id="myChart4"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart Humidity-->
+        <canvas id="myChart5"></canvas>  
+    </div>
+    <script>
+        var myChart1, myChart2, myChart3, myChart4, myChart5;
+
+        async function fetchData() {
+            try {
+                const response = await fetch(`/data`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function updateChart() {
+            const data = await fetchData();
+            if (data) {
+                var labels = data.feeds.map(feed => feed.created_at);
+                var values1 = data.feeds.map(feed => feed.field1);
+                var values2 = data.feeds.map(feed => feed.field2);
+                var values3 = data.feeds.map(feed => feed.field3);
+                var values4 = data.feeds.map(feed => feed.field4);
+
+                document.getElementById('coValue').innerText = values1[values1.length - 1]+" ppm";
+                document.getElementById('pm25Value').innerText = values2[values2.length - 1]+" ppm";
+                document.getElementById('tempValue').innerText = values3[values3.length - 1]+" celcius";
+                document.getElementById('humValue').innerText = values4[values4.length - 1]+" %";
+
+                updateSingleChart('myChart1', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart1);
+                updateSingleChart('myChart2', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart2);
+                updateSingleChart('myChart3', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart3);
+                updateSingleChart('myChart4', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart4);
+                updateSingleChart('myChart5', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart5);
+            }
+        }
+
+        function updateSingleChart(canvasId, labels, label, data, backgroundColor, borderColor, chartInstance) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+            if (!chartInstance) {
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: label,
+                            data: data,
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                            pointStyle: false,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = data;
+                chartInstance.update();
+            }
+        }
+        setInterval(updateChart, 120000); // Update every 120 seconds
+        updateChart(); // Initial call
+    </script>
+
+    <br>
+    
 </div>
 
 

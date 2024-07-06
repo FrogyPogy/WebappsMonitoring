@@ -1,5 +1,5 @@
 .main-bg{
-    background: url('/img/bg-small.jpg');
+    background: url('/img/air-pollution-medium.jpg');
     position: relative;
     background-position:center top;
     z-index: 2;
@@ -12,9 +12,24 @@
     justify-content: center;
     text-align: center;
     color: aliceblue;
-   
-    
 }
+
+footer ul{
+    list-style: none;
+}
+
+footer ul li a{
+    color: white;
+    text-decoration: none;
+}
+.overlay-container{/*Kotak transparan pada background utama*/
+    background-color: rgba(128, 128, 128, 0.5);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 800px;
+    width: 100%;
+}
+
 .header{
     text-align: center;
     justify-content: center;
@@ -33,12 +48,20 @@
 }
 .bottom-center {
     position: absolute; /* Menggunakan posisi absolut untuk menempatkan teks */
-    bottom: 60%; /* Menempatkan teks di bagian bawah */
+    bottom: 10%; /* Menempatkan teks di bagian bawah */
     left: 50%; /* Posisi horizontal di tengah */
     text-shadow: gray;
     font-size: large;
     transform: translateX(-50%); /* Membuat teks terpusat horizontal */
 }
+.link-1{
+    color:white;
+    background-color: #E6B9A6;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 15px;
+}
+
 .poppins-regular {
     font-family: "Poppins", sans-serif;
     font-weight: 400;

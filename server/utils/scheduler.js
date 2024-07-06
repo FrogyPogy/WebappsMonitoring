@@ -7,7 +7,7 @@ const math = require('mathjs');
 module.exports = {
     start: () => {
         //melakukan scheduling setiap 5 menit utk ambil dan prediksi data
-        cron.schedule('10 * * * *', updateAndPredict);
+        cron.schedule('12 * * * *', updateAndPredict);
         //melakukan scheduling setiap 3 hari sekali untuk updateModel Regresi 
         // cron.schedule('0 0 */3 * *', regressionModel.updateRegressionModel);
     },
