@@ -29,6 +29,11 @@ footer ul li a{
     max-width: 800px;
     width: 100%;
 }
+.value-label {
+    font-size: 0.8rem;
+    font-weight: normal;
+    
+}
 
 .header{
     text-align: center;
@@ -41,6 +46,7 @@ footer ul li a{
     padding-top: 20vh;
    
 }
+
 #i-container{
     border: solid;
     padding-left: 12%;
@@ -83,6 +89,26 @@ footer ul li a{
     background-color: #f9f9f9;
     margin-bottom: 10px;
 }
+.info-box.green {
+    background-color: rgba(40, 167, 69, 0.5); /* Hijau (Baik) */
+}
+
+.info-box.yellow {
+    background-color: rgb(255,255,0, 0.5); /* Kuning (Sedang) */
+}
+
+.info-box.orange {
+    background-color: rgba(255,165,0,1); /* Oranye (Tidak Sehat bagi Kelompok Rentan) */
+}
+
+.info-box.red {
+    background-color: rgba(240,128,128,1); /* Merah (Tidak Sehat) */
+}
+
+.info-box.purple {
+    background-color: #6f42c1; /* Ungu (Sangat Tidak Sehat) */
+}
+
 @media (min-width: 768px){
     .info-box + .info-box{
         margin-left: 15px;
@@ -94,10 +120,18 @@ footer ul li a{
         backdrop-filter: blur(10px);
     }
 }
-
-
 #i-header-1{
     font-size: large;
+}
+.chart-container {
+    width: 100%;
+    height: 400px; /* Atur ketinggian sesuai kebutuhan Anda */
+}
+
+/* Atur ukuran canvas agar sesuai dengan kontainer */
+canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .container{

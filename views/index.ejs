@@ -4,32 +4,47 @@
             Air Pollution Monitoring System untuk memonitoring kadar karbon monoksida, Polutan PM25, Suhu, Kelembaban serta digunakan sebagai prediksi kadar karbon monoksida dan polutan PM25
         </h3>
     </div>
-    <a href="#" class="bottom-center poppins-regular link-1">Cek Polusi Saat ini</a>
+    <a href="#container" class="bottom-center poppins-regular link-1">Cek Polusi Saat ini</a>
 </div>
 <br>
-<div class="container-md bg-second">
-    <h2 class="header">Kadar setiap dua menit sekali</h2>
+<div class="container bg-second">
+    <h3 class="header poppins-semibold" id="lastUpdatedTime"></h3>
+    <hr class="mt-0 border border-success border-2 opacity-75">
     <br>
     <!-- Kotak informasi nilai terakhir -->
-    <div class="container">
+    <div class="container" id="container">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coBox">
                 <p class="center">CO</p>
-                <h3 id="coValue"></h3>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="coValue"></h3>
+                    <p class="value-label">ppm</p>
+                </div>
+                <p id="coDescription" class="center poppins-regular"></p>
             </div>
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25Box">
                 <p class="center">PM25</p>
-                <h3 id="pm25Value"></h3>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="pm25Value"></h3>
+                    <p class="value-label">ppm</p>
+                </div>
+                <p id="pm25Description" class="center poppins-regular m-1"></p>
             </div>
         </div>
         <div class="row justify-content-center mt-3">
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">Temperature</p>
-                <h3 id="tempValue"></h3>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="tempValue"></h3>
+                    <p class="value-label">°C</p>
+                </div>
             </div>
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
                 <p class="center">Humidity</p>
-                <h3 id="humValue"></h3>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="humValue"></h3>
+                    <p class="value-label">%</p>
+                </div>
             </div>
         </div>
         <div class="text-center mt-5">
@@ -38,21 +53,31 @@
     </div>
     <br>
     
+    <div class="header justify-content-center">
+        <h3 class="poppins-regular">
+            Grafik terhitung dalam setiap menit
+        </h3>
+        <hr class="mt-0 border border-primary border-2 opacity-50">
+    </div>
+    <br>
+
     <div class="d-flex justify-content-center mb-4"><!--main chart-->
-        <canvas id="myChart1"></canvas>  
+        <canvas id="myChart1" class="chart-container"></canvas>  
     </div>
     <div class="d-flex justify-content-center mb-4"><!--chart CO-->
-        <canvas id="myChart2"></canvas>  
+        <canvas id="myChart2" class="chart-container"></canvas>  
     </div>
     <div class="d-flex justify-content-center mb-4"><!--chart PM25-->
-        <canvas id="myChart3"></canvas>  
+        <canvas id="myChart3" class="chart-container"></canvas>  
     </div>
     <div class="d-flex justify-content-center mb-4"><!--chart Temperature-->
-        <canvas id="myChart4"></canvas>  
+        <canvas id="myChart4" class="chart-container"></canvas>  
     </div>
     <div class="d-flex justify-content-center mb-4"><!--chart Humidity-->
-        <canvas id="myChart5"></canvas>  
+        <canvas id="myChart5" class="chart-container"></canvas>  
     </div>
+</div>
+    <script src="/js/indikator.js"></script>
     <script>
         var myChart1, myChart2, myChart3, myChart4, myChart5;
 
@@ -74,18 +99,40 @@
                 var values2 = data.feeds.map(feed => feed.field2);
                 var values3 = data.feeds.map(feed => feed.field3);
                 var values4 = data.feeds.map(feed => feed.field4);
+                
 
-                document.getElementById('coValue').innerText = values1[values1.length - 1]+" ppm";
-                document.getElementById('pm25Value').innerText = values2[values2.length - 1]+" ppm";
-                document.getElementById('tempValue').innerText = values3[values3.length - 1]+" celcius";
-                document.getElementById('humValue').innerText = values4[values4.length - 1]+" %";
+                document.getElementById('coValue').innerText = values1[values1.length - 1];
+                document.getElementById('pm25Value').innerText = values2[values2.length - 1];
+                document.getElementById('tempValue').innerText = values3[values3.length - 1];
+                document.getElementById('humValue').innerText = values4[values4.length - 1];
+                var lastUpdatedTime = formatDateTime(labels[labels.length - 1]);
+                document.getElementById('lastUpdatedTime').innerText = lastUpdatedTime;
+
+                updateCOBox(values1[values1.length - 1]);
+                updatePM25Box(values2[values2.length - 1]);
 
                 updateSingleChart('myChart1', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart1);
                 updateSingleChart('myChart2', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart2);
                 updateSingleChart('myChart3', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart3);
                 updateSingleChart('myChart4', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart4);
                 updateSingleChart('myChart5', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart5);
+                
+                
             }
+        }
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const monthName = months[date.getMonth()];
+            const time = date.toLocaleTimeString('id-ID', { hour: 'numeric', minute: '2-digit' });
+
+            return `${dayName} ${day} ${monthName}, ${time} WIB`;
         }
 
         function updateSingleChart(canvasId, labels, label, data, backgroundColor, borderColor, chartInstance) {
@@ -106,6 +153,8 @@
                         }]
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio:false,
                         scales: {
                             x: {
                                 grid: {
@@ -127,9 +176,7 @@
         setInterval(updateChart, 120000); // Update every 120 seconds
         updateChart(); // Initial call
     </script>
-
     <br>
-    
-</div>
+
 
 

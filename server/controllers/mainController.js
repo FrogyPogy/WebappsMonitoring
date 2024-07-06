@@ -120,10 +120,10 @@ exports.getData = async (req, res) => {
         const channelId = '2422190';
         const response = await fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=60`);
         const data = await response.json();
-        data.feeds = data.feeds.map(feedTime=>{
-          feedTime.created_at = formatDate(feedTime.created_at);
-          return feedTime;
-        })
+        // data.feeds = data.feeds.map(feedTime=>{
+        //   feedTime.created_at = formatDate(feedTime.created_at);
+        //   return feedTime;
+        // })
         res.json(data);
   }catch(error){
       console.error('Error fetching data from ThingSpeak:', error);
