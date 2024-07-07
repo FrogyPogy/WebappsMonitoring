@@ -77,6 +77,7 @@
         <canvas id="myChart5" class="chart-container"></canvas>  
     </div>
 </div>
+    <!--indikator js berisikan pemformatan waktu serta pemberian indikator level CO dan PM25-->
     <script src="/js/indikator.js"></script>
     <script>
         var myChart1, myChart2, myChart3, myChart4, myChart5;
@@ -94,7 +95,10 @@
         async function updateChart() {
             const data = await fetchData();
             if (data) {
-                var labels = data.feeds.map(feed => feed.created_at);
+                //format waktu dari label menjadi hours:minutes WIB
+                var labels = data.feeds.map(feed => formatTime(feed.created_at));
+                //Ambil atribut waktu dari data terakhir
+                var lastLabels = data.feeds[data.feeds.length - 1].created_at;
                 var values1 = data.feeds.map(feed => feed.field1);
                 var values2 = data.feeds.map(feed => feed.field2);
                 var values3 = data.feeds.map(feed => feed.field3);
@@ -105,37 +109,29 @@
                 document.getElementById('pm25Value').innerText = values2[values2.length - 1];
                 document.getElementById('tempValue').innerText = values3[values3.length - 1];
                 document.getElementById('humValue').innerText = values4[values4.length - 1];
-                var lastUpdatedTime = formatDateTime(labels[labels.length - 1]);
+                var lastUpdatedTime = formatDateTime(lastLabels);
                 document.getElementById('lastUpdatedTime').innerText = lastUpdatedTime;
 
                 updateCOBox(values1[values1.length - 1]);
                 updatePM25Box(values2[values2.length - 1]);
 
-                updateSingleChart('myChart1', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart1);
-                updateSingleChart('myChart2', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart2);
-                updateSingleChart('myChart3', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart3);
-                updateSingleChart('myChart4', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart4);
-                updateSingleChart('myChart5', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart5);
-                
-                
+                updateSingleChart('myChart1', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart1, lastLabels, 'ppm');
+                updateSingleChart('myChart2', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart2, lastLabels, 'ppm');
+                updateSingleChart('myChart3', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart3, lastLabels, '°C');
+                updateSingleChart('myChart4', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart4, lastLabels, '%');
+                updateSingleChart('myChart5', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart5, lastLabels, 'm/s');
             }
         }
-        function formatDateTime(dateString) {
+
+        function formatTime(dateString) {
             const date = new Date(dateString);
             if (isNaN(date.getTime())) {
                 return 'Invalid Date';
             }
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const dayName = days[date.getDay()];
-            const day = date.getDate();
-            const monthName = months[date.getMonth()];
-            const time = date.toLocaleTimeString('id-ID', { hour: 'numeric', minute: '2-digit' });
-
-            return `${dayName} ${day} ${monthName}, ${time} WIB`;
+            return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
         }
 
-        function updateSingleChart(canvasId, labels, label, data, backgroundColor, borderColor, chartInstance) {
+        function updateSingleChart(canvasId, labels, label, data, backgroundColor, borderColor, chartInstance, lastLabels, ylabels) {
             var ctx = document.getElementById(canvasId).getContext('2d');
             if (!chartInstance) {
                 chartInstance = new Chart(ctx, {
@@ -159,10 +155,31 @@
                             x: {
                                 grid: {
                                     display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: formatDate(lastLabels),
+                                    font:{
+                                        weight: 'bold',
+                                        family: 'Arial',
+                                        size: '16'
+                                    },
+                                    padding:{
+                                        top: 15,
+                                        bottom: 25
+                                    }
                                 }
                             },
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                title:{
+                                    display: true,
+                                    text: ylabels,
+                                    font: {
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                }
                             }
                         }
                     }
