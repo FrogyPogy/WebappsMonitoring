@@ -1,6 +1,75 @@
-function updateCOBox(coValue) {
-    const coBox = document.getElementById('coBox');
-    const coDescription = document.getElementById('coDescription');
+function hideShow(){
+    var x = document.getElementById("predictionContent");
+    if (x.style.display = "none"){
+        x.style.display = "block";
+    }else if(x.style.display = "block"){
+        x.style.display = "none";
+    }
+}
+//update single chart js
+function updateSingleChart(canvasId, labels, label, data, backgroundColor, borderColor, chartInstance, lastLabels, ylabels) {
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    if (!chartInstance) {
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1,
+                    pointStyle: false,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio:false,
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: formatDate(lastLabels),
+                            font:{
+                                weight: 'bold',
+                                family: 'Arial',
+                                size: '16'
+                            },
+                            padding:{
+                                top: 15,
+                                bottom: 25
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title:{
+                            display: true,
+                            text: ylabels,
+                            font: {
+                                family: 'Arial',
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        chartInstance.data.labels = labels;
+        chartInstance.data.datasets[0].data = data;
+        chartInstance.update();
+    }
+}
+
+function updateCOBox(coValue, idBox, idDescription) {
+    const coBox = document.getElementById(idBox);
+    const coDescription = document.getElementById(idDescription);
     if (coValue <= 4) {
         coBox.style.backgroundColor = 'rgba(0, 255, 0, 0.5)';
         coDescription.innerText = 'Baik';
@@ -22,9 +91,9 @@ function updateCOBox(coValue) {
     }
 }
 
-function updatePM25Box(pm25Value) {
-    const pm25Box = document.getElementById('pm25Box');
-    const pm25Description = document.getElementById('pm25Description');
+function updatePM25Box(pm25Value, idBox, idDescription) {
+    const pm25Box = document.getElementById(idBox);
+    const pm25Description = document.getElementById(idDescription);
     if (pm25Value <= 12) {
         pm25Box.style.backgroundColor = 'rgba(0, 255, 0, 0.5)';
         pm25Description.innerText = 'Baik';
@@ -60,6 +129,14 @@ function formatDateTime(dateString) {
 
     return `${dayName} ${day} ${monthName}, ${time} WIB`;
 }
+function formatTime(dateString) {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+    }
+    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+}
+
 function formatDate(dateString) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {

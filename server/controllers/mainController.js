@@ -131,4 +131,16 @@ exports.getData = async (req, res) => {
   }
 }
 
+exports.getPrediction = async (req, res) => {
+  try{
+    const lastPrediction = await Promise.all([
+      resultPrediction.findOne({ jenis: 'CO' }).sort({ createdAt: -1 }),
+      resultPrediction.findOne({ jenis: 'PM25' }).sort({ createdAt: -1 })
+    ]);
+    res.json(lastPrediction);
+  }catch(error){
+    res.status(500).json({ error: 'Error fetching data from Prediction' });
+  }
+}
+
 

@@ -34,6 +34,11 @@ footer ul li a{
     font-weight: normal;
     
 }
+/* Tambahkan CSS untuk menyembunyikan konten prediksi secara default */
+#predictionContent{
+    text-align: center;
+    display: none;
+}
 
 .header{
     text-align: center;
