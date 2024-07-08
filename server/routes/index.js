@@ -20,5 +20,10 @@ router.get('/initializeModel',mainController.initializeModel);
 //Route signIn
 router.get('/signIn',loginController.signInPage);
 router.post('/signIn',loginController.checkAuth);
+//Route signUp
+router.post('/signUp',loginController.createUser);
+router.get('/signUp',loginController.signUpPage);
+
+
 
 module.exports = router;
