@@ -51,6 +51,16 @@ footer ul li a{
     padding-top: 20vh;
    
 }
+.fail-alert{
+    color: #fb4143;
+    font-family: sans-serif;
+    text-align: center;
+}
+.success-alert{
+    color: #0dd157;
+    font-family: sans-serif;
+    text-align: center;
+}
 
 #i-container{
     border: solid;

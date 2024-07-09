@@ -23,7 +23,8 @@ router.post('/signIn',loginController.checkAuth);
 //Route signUp
 router.post('/signUp',loginController.createUser);
 router.get('/signUp',loginController.signUpPage);
-
+//Route admin
+router.get('/admin', adminController.dashboard);
 
 
 module.exports = router;

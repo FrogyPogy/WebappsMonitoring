@@ -7,12 +7,12 @@ const userSchema = new Schema({
     username:{
         type: String,
         required: true,
-        unique: [true, 'username has been used']
+        unique: true
     },
     email: {
         type: String,
         required: true,
-        unique: [true, 'email has been used'], 
+        unique: true, 
         lowercase: true,
         validate: [isEmail, 'Please enter a valid email']
     },

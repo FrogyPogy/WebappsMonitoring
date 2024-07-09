@@ -1,0 +1,39 @@
+
+<!--Navbar-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-md">
+      <a class="navbar-brand fs-4 poppins-bold" id="header-1" href="#">
+        <img src="/img/logo_airmind3.svg" alt="AIRMIND logo" width="48" height="40"> AIRMIND</a>
+      <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header text-white border-bottom">
+          <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">AIRMIND</h5>
+          <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-center 
+          align-items-center fs-5 flex-grow-1 pe-3">
+            <li class="nav-item mx-2">
+              <a class="nav-link active" aria-current="page" href="/">dashboard</a>
+            </li>
+            <li class="nav-item mx-2">
+              <a class="nav-link" href="#">history</a>
+            </li>
+            <li class="nav-item mx-2">
+                <a class="nav-link" href="#">evaluation</a>
+            </li>
+            <!-- <li class="nav-item mx-2">
+              <a class="text-white text-decoration-none px-3 py-1 rounded-3" href="/signIn">Sign In</a>
+            </li> -->
+          </ul>
+          <div class="d-flex pe-3 justify-content-center align-items-center gap-3">
+            <a href="/signOut" class="text-white text-decoration-none px-4 py-1 rounded-4 signBtn fs-6">
+              Sign Out
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

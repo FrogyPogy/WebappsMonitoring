@@ -47,6 +47,17 @@
 									</button>
 								</div>
 							</form>
+							<!-- isi Errors message dibawah-->
+							<% if (success_msg) { %>
+								<p class="success-alert">
+									<%= success_msg %>
+								</p>	
+							<% } %>
+							<% if (error_msg) { %>
+								<p class="fail-alert">
+									<%= error_msg %>
+								</p>
+							<% } %>
 						</div>
 						<div class="card-footer py-3 border-0">
 							<div class="text-center">
