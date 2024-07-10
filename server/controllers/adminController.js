@@ -5,7 +5,8 @@ exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek 
     try{
         const locals = {
             title: 'AIRMIND',
-            description:'Air Pollution Monitoring and Prediction System'
+            description:'Air Pollution Monitoring and Prediction System',
+            layout: './layouts/admin'
         };
         res.render('admin/dashboard', locals); //rendering admin dashboarad in views
     }catch (error){

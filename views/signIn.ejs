@@ -13,10 +13,10 @@
 							<h1 class="fs-4 card-title fw-bold mb-4">Sign in</h1>
 							<form action="/signIn" method="POST" class="needs-validation" novalidate="" autocomplete="off">
 								<div class="mb-3">
-									<label class="mb-2 text-muted" for="username">Username</label>
-									<input id="username" type="text" class="form-control" name="username" value="" required autofocus>
+									<label class="mb-2 text-muted" for="email">Email</label>
+									<input id="email" type="email" class="form-control" name="email" value="" required autofocus>
 									<div class="invalid-feedback">
-										Username is invalid
+										Email is invalid
 									</div>
 								</div>
 
@@ -42,6 +42,11 @@
 								</div>
 							</form>
 						</div>
+						<% if (error_msg) { %>
+							<p class="fail-alert">
+								<%= error_msg %>
+							</p>
+						<% } %>
 						<div class="card-footer py-3 border-0">
 							<div class="text-center">
 								First Time Here? <a href="/signUp" class="float-none">Create One</a>

@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 const user = require('../models/user');
 const jwt = require('jsonwebtoken');
+const { json } = require("express");
+
+const maxAge = 1 * 24 * 60 * 60;
+const createdToken = (id) => {
+    return jwt.sign({ id }, 'AirMind secret key', {
+        expiresIn: maxAge
+    });
+}
 
 exports.signInPage = async(req, res) => {
     const locals = {
@@ -17,27 +25,23 @@ exports.signUpPage = async(req, res) => {
     }
     res.render('signUp', locals);
 }
-
+//Login or Sign in
 exports.checkAuth = async (req, res) => {
     try{
-        const {username, password} = req.body;
-        if(req.body.username === 'admin' && req.body.password === 'password'){
-            res.send('You are logged in as Admin.');
-            res.redirect('/admin'); //redirect To Admin
-        }else{
-            res.send('incorrect username or password!');
-        }
+        const {email, password} = req.body;
+        const auth = await user.login(email, password);
         
+        if (auth){
+            const token = createdToken(auth._id);
+            res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000});
+            res.redirect('/admin');
+        }
     }catch(error){
       console.log(error);
+      req.flash('error_msg', error.message);
+      res.redirect('/signIn');
     }
   };
-const maxAge = 1 * 24 * 60 * 60;
-const createdToken = (id) => {
-    return jwt.sign({ id }, 'AirMind secret key', {
-        expiresIn: maxAge
-    });
-}
 
 exports.createUser = async (req, res) => {
     const {name, email, password} = req.body;
@@ -72,5 +76,10 @@ exports.createUser = async (req, res) => {
         }
         res.redirect('/signUp');
     }
+};
+//destroy jwt cookies
+exports.signOut = (req, res) => {
+    res.cookie('jwt', '', { maxAge: 1 });
+    res.redirect('/');
 };
 

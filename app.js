@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const expresLayouts = require('express-ejs-layouts');
+const expressLayouts = require('express-ejs-layouts');
 const connectDB = require('./server/config/db');
 const schedule = require('./server/utils/scheduler');
 const cookieParser = require('cookie-parser');
@@ -38,14 +38,12 @@ app.use((req, res, next) =>{
 });
 
 // Templating Engine
-app.use(expresLayouts);
+app.use(expressLayouts);
 app.set('layout', './layouts/main');
 app.set('view engine', 'ejs');
 
 //Route Handling
 app.use('/', require('./server/routes/index'));
-
-
 
 // ERROR HANDLING 404
 app.get('*', function(req, res){

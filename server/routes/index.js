@@ -3,6 +3,7 @@ const router = express.Router();
 const mainController = require('../controllers/mainController');
 const adminController = require('../controllers/adminController');
 const loginController = require('../controllers/loginController');
+const requireAuth = require('../middleware/authMiddleware');
 
 /** Routes app*/
 router.get('/',mainController.homepage);
@@ -23,8 +24,10 @@ router.post('/signIn',loginController.checkAuth);
 //Route signUp
 router.post('/signUp',loginController.createUser);
 router.get('/signUp',loginController.signUpPage);
+//Route signout
+router.get('/signOut',loginController.signOut);
 //Route admin
-router.get('/admin', adminController.dashboard);
+router.get('/admin', requireAuth, adminController.dashboard);
 
 
 module.exports = router;
