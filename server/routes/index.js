@@ -10,8 +10,6 @@ router.get('/',mainController.homepage);
 router.get('/about',mainController.about);
 //router intializeDataset
 router.get('/initialize',mainController.initializeData);
-//Route menampilkan hasil prediksi
-router.get('/prediction', mainController.displayPrediction);
 //Route menampilkan hasil prediksi terbaru
 router.get('/getPrediction', mainController.getPrediction);
 //Route fetch data real-time dari thingspeak ke dashboard
@@ -28,6 +26,9 @@ router.get('/signUp',loginController.signUpPage);
 router.get('/signOut',loginController.signOut);
 //Route admin
 router.get('/admin', requireAuth, adminController.dashboard);
-
+//Route menampilkan seluruh hasil prediksi
+router.get('/prediction', requireAuth, mainController.displayPrediction);
+//Route menampilkan semua data pollution yang disimpan dalam satuan jam
+router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 
 module.exports = router;
