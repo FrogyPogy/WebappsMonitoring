@@ -117,6 +117,19 @@ function formatDate(dateStr){
   return `${hours}:00, ${day}`;
 }
 
+//Get data from thingspeak 
+exports.getData = async (req, res) => {
+  try{
+    const apiKey = '2P8XPOJ7NOLG0YPU';
+        const channelId = '2422190';
+        const response = await fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=60`);
+        const data = await response.json();
+        res.json(data);
+  }catch(error){
+      console.error('Error fetching data from ThingSpeak:', error);
+      res.status(500).json({ error: 'Error fetching data' });
+  }
+}
 exports.getPrediction = async (req, res) => {
   try{
     const lastPrediction = await Promise.all([

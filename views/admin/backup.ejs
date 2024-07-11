@@ -1,0 +1,165 @@
+<div class="main-bg">
+    <h1 class="overlay-container poppins-regular">Welcome To Admin Dashboard</h1>
+</div>
+
+<div class="container-md">
+    
+    <br>
+    <!-- Kotak informasi nilai terakhir -->
+    <div class="container" id="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coBox">
+                <p class="center">CO</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="coValue"></h3>
+                    <p class="value-label">ppm</p>
+                </div>
+                <p id="coDescription" class="center poppins-regular"></p>
+            </div>
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25Box">
+                <p class="center">PM25</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="pm25Value"></h3>
+                    <p class="value-label">ppm</p>
+                </div>
+                <p id="pm25Description" class="center poppins-regular m-1"></p>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+                <p class="center">Temperature</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="tempValue"></h3>
+                    <p class="value-label">°C</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+                <p class="center">Humidity</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="humValue"></h3>
+                    <p class="value-label">%</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <button onclick="hideShow()" class="btn btn-outline-success me-2">View Prediction</button>
+        </div>
+        <br>
+        <!-- Konten prediksi -->
+        <div class="container bg-second" id="predictionContent">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coPredictionBox">
+                    <p class="center">Prediction CO next hours</p>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h3 id="predictionCO"></h3>
+                        <p class="value-label">ppm</p>
+                    </div>
+                    <p class="center poppins-regular" id="coPredictDesc">Prediction Description CO</p>
+                </div>
+                <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25PredictionBox">
+                    <p class="center">Prediction PM25 next hours</p>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h3 id="predictionPM25"></h3>
+                        <p class="value-label">ppm</p>
+                    </div>
+                    <p class="center poppins-regular" id="pm25PredictDesc">Prediction Description PM25</p>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <div class="header justify-content-center">
+        <h3 class="poppins-regular">
+            Grafik terhitung dalam setiap menit
+        </h3>
+        <hr class="mt-0 border border-primary border-2 opacity-50">
+    </div>
+    <br>
+
+    <div class="d-flex justify-content-center mb-4"><!--main chart-->
+        <canvas id="myChart6" class="chart-container"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart CO-->
+        <canvas id="myChart7" class="chart-container"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart PM25-->
+        <canvas id="myChart8" class="chart-container"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart Temperature-->
+        <canvas id="myChart9" class="chart-container"></canvas>  
+    </div>
+    <div class="d-flex justify-content-center mb-4"><!--chart Humidity-->
+        <canvas id="myChart10" class="chart-container"></canvas>  
+    </div>
+    
+</div>
+<script src="/js/indikator.js"></script>
+<script>
+    var myChart6, myChart7, myChart8, myChart9, myChart10;
+
+    async function fetchData() {
+        try {
+            const response = await fetch(`/data`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    async function lastPredict(){
+        try{
+            const response = await fetch(`/getPrediction`);
+            const dataPredict = await response.json();
+
+            const coPrediction = parseFloat(dataPredict[0].value).toFixed(2);
+            const pm25Prediction = parseFloat(dataPredict[1].value).toFixed(2);
+
+            document.getElementById('predictionCO').innerText = coPrediction;
+            document.getElementById('predictionPM25').innerText = pm25Prediction;
+
+            //box prediksi kategori level polutan
+            updateCOBox(coPrediction, 'coPredictionBox', 'coPredictDesc');
+            updatePM25Box(pm25Prediction, 'pm25PredictionBox', 'pm25PredictDesc');
+
+        }catch(error){
+            console.error('Error fetching last data prediction', error);
+        }
+    }
+
+    async function updateChart() {
+        const data = await fetchData();
+        if (data) {
+            //format waktu dari label menjadi hours:minutes WIB
+            var labels = data.feeds.map(feed => formatTime(feed.created_at));
+            //Ambil atribut waktu dari data terakhir
+            var lastLabels = data.feeds[data.feeds.length - 1].created_at;
+            var values1 = data.feeds.map(feed => feed.field1);
+            var values2 = data.feeds.map(feed => feed.field2);
+            var values3 = data.feeds.map(feed => feed.field3);
+            var values4 = data.feeds.map(feed => feed.field4);
+            
+
+            document.getElementById('coValue').innerText = values1[values1.length - 1];
+            document.getElementById('pm25Value').innerText = values2[values2.length - 1];
+            document.getElementById('tempValue').innerText = values3[values3.length - 1];
+            document.getElementById('humValue').innerText = values4[values4.length - 1];
+            var lastUpdatedTime = formatDateTime(lastLabels);
+            document.getElementById('lastUpdatedTime').innerText = lastUpdatedTime;
+            //box information kategori level polutan
+            updateCOBox(values1[values1.length - 1], 'coBox', 'coDescription');
+            updatePM25Box(values2[values2.length - 1], 'pm25Box', 'pm25Description');
+
+            updateSingleChart('myChart6', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart6, lastLabels, 'ppm');
+            updateSingleChart('myChart7', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart7, lastLabels, 'ppm');
+            updateSingleChart('myChart8', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart8, lastLabels, '°C');
+            updateSingleChart('myChart9', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart9, lastLabels, '%');
+            updateSingleChart('myChart10', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart10, lastLabels, 'm/s');
+        }
+    }
+    
+    setInterval(updateChart, 120000); // Update every 120 seconds
+    updateChart(); // Initial call
+    lastPredict();
+</script>
