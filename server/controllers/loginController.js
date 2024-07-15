@@ -73,4 +73,3 @@ exports.createUser = async (req, res) => {
         res.redirect('/signUp');
     }
 };
-
