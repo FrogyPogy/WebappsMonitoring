@@ -70,23 +70,25 @@ function updateSingleChart(canvasId, labels, label, data, backgroundColor, borde
 function updateCOBox(coValue, idBox, idDescription) {
     const coBox = document.getElementById(idBox);
     const coDescription = document.getElementById(idDescription);
+    coBox.className = 'col-12 col-md-5 info-box mb-3 mb-md-0'; // Reset kelas
+
     if (coValue <= 4) {
-        coBox.style.backgroundColor = 'rgba(0, 255, 0, 0.5)';
+        coBox.classList.add('green');
         coDescription.innerText = 'Baik';
     } else if (coValue <= 9) {
-        coBox.style.backgroundColor = 'yellow';
+        coBox.classList.add('yellow');
         coDescription.innerText = 'Sedang';
     } else if (coValue <= 15) {
-        coBox.style.backgroundColor = 'orange';
+        coBox.classList.add('orange');
         coDescription.innerText = 'Tidak Sehat bagi Kelompok Rentan';
     } else if (coValue <= 30) {
-        coBox.style.backgroundColor = 'red';
+        coBox.classList.add('red');
         coDescription.innerText = 'Tidak Sehat';
     } else if (coValue <= 40) {
-        coBox.style.backgroundColor = 'purple';
+        coBox.classList.add('purple');
         coDescription.innerText = 'Sangat Tidak Sehat';
     } else {
-        coBox.style.backgroundColor = 'maroon';
+        coBox.classList.add('maroon');
         coDescription.innerText = 'Berbahaya';
     }
 }
@@ -94,23 +96,25 @@ function updateCOBox(coValue, idBox, idDescription) {
 function updatePM25Box(pm25Value, idBox, idDescription) {
     const pm25Box = document.getElementById(idBox);
     const pm25Description = document.getElementById(idDescription);
+    pm25Box.className = 'col-12 col-md-5 info-box mb-3 mb-md-0'; // Reset kelas
+
     if (pm25Value <= 12) {
-        pm25Box.style.backgroundColor = 'rgba(0, 255, 0, 0.5)';
+        pm25Box.classList.add('greenPM');
         pm25Description.innerText = 'Baik';
     } else if (pm25Value <= 35.4) {
-        pm25Box.style.backgroundColor = 'yellow';
+        pm25Box.classList.add('yellowPM');
         pm25Description.innerText = 'Sedang';
     } else if (pm25Value <= 55.4) {
-        pm25Box.style.backgroundColor = 'orange';
+        pm25Box.classList.add('orangePM');
         pm25Description.innerText = 'Tidak Sehat bagi Kelompok Rentan';
     } else if (pm25Value <= 150.4) {
-        pm25Box.style.backgroundColor = 'red';
+        pm25Box.classList.add('redPM');
         pm25Description.innerText = 'Tidak Sehat';
     } else if (pm25Value <= 250.4) {
-        pm25Box.style.backgroundColor = 'purple';
+        pm25Box.classList.add('purplePM');
         pm25Description.innerText = 'Sangat Tidak Sehat';
     } else {
-        pm25Box.style.backgroundColor = 'brown';
+        pm25Box.classList.add('brownPM');
         pm25Description.innerText = 'Berbahaya';
     }
 }

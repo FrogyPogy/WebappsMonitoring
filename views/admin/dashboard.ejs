@@ -1,35 +1,287 @@
-<div class="main-bg">
-    <p class="bottom-center poppins-regular">Welcome To Admin Dashboard</p>
-</div>
+  <!-- ! Main -->
+    <main class="main users chart-page" id="skip-target">
+      <div class="container">
+        <h2 class="main-title">Dashboard</h2>
+        <div class="row stat-cards">
+          <div class="col-md-6 col-xl-3">
+            <article class="stat-cards-item">
+              <div class="stat-cards-icon primary">
+                <i data-feather="bar-chart-2" aria-hidden="true"></i>
+              </div>
+              <!--Isikan dengan jumlah keseluruhan dataset yang disimpan-->
+              <div class="stat-cards-info">
+                <p class="stat-cards-info__num"><%= totalData %></p>
+                <p class="stat-cards-info__title">Total Data saved</p>
+                <p class="stat-cards-info__progress">
+                  <span class="stat-cards-info__profit success">
+                    <i data-feather="trending-up" aria-hidden="true"></i>4.07%
+                  </span>
+                  Last month
+                </p>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <article class="stat-cards-item">
+              <div class="stat-cards-icon warning">
+                <i data-feather="file" aria-hidden="true"></i>
+              </div>
+              <div class="stat-cards-info">
+                <p class="stat-cards-info__num">83%</p>
+                <p class="stat-cards-info__title">Peformance CO model</p>
+                <p class="stat-cards-info__progress">
+                  <span class="stat-cards-info__profit success">
+                    <i data-feather="trending-up" aria-hidden="true"></i>0.24%
+                  </span>
+                  Last month
+                </p>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <article class="stat-cards-item">
+              <div class="stat-cards-icon purple">
+                <i data-feather="file" aria-hidden="true"></i>
+              </div>
+              <div class="stat-cards-info">
+                <p class="stat-cards-info__num">78%</p>
+                <p class="stat-cards-info__title">Performance PM25 model</p>
+                <p class="stat-cards-info__progress">
+                  <span class="stat-cards-info__profit danger">
+                    <i data-feather="trending-down" aria-hidden="true"></i>1.64%
+                  </span>
+                  Last month
+                </p>
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <article class="stat-cards-item">
+              <div class="stat-cards-icon success">
+                <i data-feather="feather" aria-hidden="true"></i>
+              </div>
+              <div class="stat-cards-info">
+                <p class="stat-cards-info__num"><%= totalPredicted %></p>
+                <p class="stat-cards-info__title">Total Predicted Data</p>
+                <p class="stat-cards-info__progress">
+                  <span class="stat-cards-info__profit warning">
+                    <i data-feather="trending-up" aria-hidden="true"></i>0.00%
+                  </span>
+                  Last month
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-9">
+            <div>
+              <h2>Isi dengan secondary chart</h2>
+              <canvas id="myChart1" class="chart-container"></canvas>
+              <canvas id="myChart2" class="chart-container"></canvas>
+              <canvas id="myChart3" class="chart-container"></canvas>
+              <canvas id="myChart4" class="chart-container"></canvas>
+              <canvas id="myChart5" class="chart-container"></canvas>
+            </div>
+            <div class="users-table table-wrapper">
+              <table class="posts-table">
+                <thead>
+                  <tr class="users-table-info">
+                    <th>
+                      <label class="users-table__checkbox">
+                        <p>#</p>
+                      </label>
+                    </th>
+                    <th>Time</th>
+                    <th>CO</th>
+                    <th>PM25</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>WindSpeed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <!-- <article class="customers-wrapper">
+              <canvas id="customersChart" aria-label="Customers statistics" role="img"></canvas>
+            </article>
+            <article class="white-block"> -->
+              <!-- Kotak informasi nilai terakhir -->
+              <h3 class="header poppins-semibold" id="lastUpdatedTime"></h3>
+              <hr class="mt-0 border border-success border-2 opacity-75">
+              <div class="container" id="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coBox">
+                        <div class="icon-container"></div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="coValue"></h3>
+                            <p class="value-label">ppm</p>
+                        </div>
+                        <p id="coDescription" class="center poppins-regular"></p>
+                    </div>
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25Box">
+                        <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="pm25Value"></h3>
+                            <p class="value-label">ppm</p>
+                        </div>
+                        <p id="pm25Description" class="center poppins-regular m-1"></p>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-3">
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0 temp">
+                        <p class="center">Temperature</p>
+                        <div class="icon-container"></div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="tempValue"></h3>
+                            <p class="value-label">°C</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0 hum">
+                        <p class="center">Humidity</p>
+                        <div class="icon-container"></div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="humValue"></h3>
+                            <p class="value-label">%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-3">
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0 ws">
+                        <p class="center">WindSpeed</p>
+                        <div class="icon-container"></div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="wsValue"></h3>
+                            <p class="value-label">m/s</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="text-center mt-5">
+                    <a class="btn btn-outline-success me-2" href="/prediction">View Prediction</a>
+                </div> -->
+                <div class="text-center mt-5">
+                    <button onclick="hideShow()" class="btn btn-outline-success me-2">View Prediction</button>
+                </div>
+              </div>
+              <br>
+              <!-- Konten prediksi -->
+              <div class="container bg-second" id="predictionContent">
+                <div><h3 class="center">Prediction next hours</h3></div>
+                <br>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coPredictionBox">
+                        <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="predictionCO"></h3>
+                            <p class="value-label">ppm</p>
+                        </div>
+                        <p class="center poppins-regular" id="coPredictDesc">Prediction Description CO</p>
+                    </div>
+                    <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25PredictionBox">
+                        
+                        <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h3 id="predictionPM25"></h3>
+                            <p class="value-label">ppm</p>
+                        </div>
+                        <p class="center poppins-regular" id="pm25PredictDesc">Prediction Description PM25</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <!-- </article> -->
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="text-white py-3">
+      
+      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Home</a></li>
+        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Contacts</a></li>
+        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">About</a></li>
+      </ul>
+      <p class="text-white text-center text-muted">© 2024 AIRMIND, Inc</p>
+      
+    </footer>
+<!-- Chart library -->
+<!-- <script src="./plugins/chart.min.js"></script> -->
+<!-- Icons library -->
+<script src="plugins/feather.min.js"></script>
+<script src="/js/indikator.js"></script>
+<script>
+  var myChart1, myChart2, myChart3, myChart4, myChart5;
 
-<div class="container-md">
-    
-    <br>
-    <!-- Kotak informasi nilai terakhir -->
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
-                <p class="center">CO</p>
-                <h3 id="coValue">-</h3>
-            </div>
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
-                <p class="center">PM25</p>
-                <h3 id="pm25Value">-</h3>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-3">
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
-                <p class="center">Temperature</p>
-                <h3 id="tempValue">-</h3>
-            </div>
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
-                <p class="center">Humidity</p>
-                <h3 id="humValue">-</h3>
-            </div>
-        </div>
-        <div class="text-center mt-5">
-            <a class="btn btn-primary" href="/prediction">View Prediction</a>
-        </div>
-    </div>
-    
-</div>
+  async function fetchData() {
+      try {
+          const response = await fetch(`/data`);
+          const data = await response.json();
+          return data;
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      }
+  }
+
+  async function lastPredict(){
+    try{
+      const response = await fetch(`/getPrediction`);
+      const dataPredict = await response.json();
+
+      const coPrediction = parseFloat(dataPredict[0].value).toFixed(2);
+      const pm25Prediction = parseFloat(dataPredict[1].value).toFixed(2);
+
+      document.getElementById('predictionCO').innerText = coPrediction;
+      document.getElementById('predictionPM25').innerText = pm25Prediction;
+
+      //box prediksi kategori level polutan
+      updateCOBox(coPrediction, 'coPredictionBox', 'coPredictDesc');
+      updatePM25Box(pm25Prediction, 'pm25PredictionBox', 'pm25PredictDesc');
+
+    }catch(error){
+      console.error('Error fetching last data prediction', error);
+    }
+  }
+  
+  async function updateChart() {
+      const data = await fetchData();
+      if (data) {
+          //format waktu dari label menjadi hours:minutes WIB
+          var labels = data.feeds.map(feed => formatTime(feed.created_at));
+          //Ambil atribut waktu dari data terakhir
+          var lastLabels = data.feeds[data.feeds.length - 1].created_at;
+          var values1 = data.feeds.map(feed => feed.field1);
+          var values2 = data.feeds.map(feed => feed.field2);
+          var values3 = data.feeds.map(feed => feed.field3);
+          var values4 = data.feeds.map(feed => feed.field4);
+          var values5 = data.feeds.map(feed => feed.field5);
+
+          document.getElementById('coValue').innerText = values1[values1.length - 1];
+          document.getElementById('pm25Value').innerText = values2[values2.length - 1];
+          document.getElementById('tempValue').innerText = values3[values3.length - 1];
+          document.getElementById('humValue').innerText = values4[values4.length - 1];
+          document.getElementById('wsValue').innerText = values5[values4.length - 1];
+          var lastUpdated = formatDateTime(lastLabels);
+          document.getElementById('lastUpdatedTime').innerText = lastUpdated;
+          //box information kategori level polutan
+          updateCOBox(values1[values1.length - 1], 'coBox', 'coDescription');
+          updatePM25Box(values2[values2.length - 1], 'pm25Box', 'pm25Description');
+
+          updateSingleChart('myChart1', labels, 'CO', values1, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)', myChart1, lastLabels, 'ppm');
+          updateSingleChart('myChart2', labels, 'PM25', values2, 'rgba(192, 75, 75, 0.2)', 'rgba(192, 75, 75, 1)', myChart2, lastLabels, 'ppm');
+          updateSingleChart('myChart3', labels, 'Temperature', values3, 'rgba(75, 75, 192, 0.2)', 'rgba(75, 75, 192, 1)', myChart3, lastLabels, '°C');
+          updateSingleChart('myChart4', labels, 'Humidity', values4, 'rgba(75, 192, 75, 0.2)', 'rgba(75, 192, 75, 1)', myChart4, lastLabels, '%');
+          updateSingleChart('myChart5', labels, 'WindSpeed', values5, 'rgba(192, 192, 75, 0.2)', 'rgba(192, 192, 75, 1)', myChart5, lastLabels, 'm/s');
+      }
+  }
+  
+  setInterval(updateChart, 120000); // Update every 120 seconds
+  updateChart(); // Initial call
+  lastPredict();
+</script>
+<!-- Custom scripts -->
+<script src="/js/script.js"></script>

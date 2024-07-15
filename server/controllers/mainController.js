@@ -78,13 +78,12 @@ exports.initializeModel = async (req, res) => {
     const firstDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
     await regressionModel.firstTrainPM25(firstDataset);
     await regressionModel.firstTrain(firstDataset);
-    const locals = {
-      title: 'AIRMIND',
-      description:'Air Pollution Monitoring and Prediction System'
-    };
-    res.render('index', locals); //rendering index.ejs in views
+  
+    req.flash('success_msg', 'model trained successfully');
+    res.redirect('prediction'); //rendering index.ejs in views
   }catch(error){
-    console.error('terjadi kesalahan: ', error);
+    req.flash('error_msg', 'fail to train model');
+    res.redirect('/prediction');
     res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
   }
 };
@@ -92,12 +91,17 @@ exports.initializeModel = async (req, res) => {
 exports.displayPrediction = async (req, res) => {
     //Ambil prediksi dari database resultPrediction
     try {
+      const locals = {
+        title: 'Prediction - AIRMIND',
+        description:'Air Pollution Monitoring and Prediction System',
+        layout: './layouts/admin'
+      };
       const predictions = await resultPrediction.find({});
-      res.render('prediction', { predictions: predictions.map(p => ({
+      res.render('admin/prediction', { ...locals, predictions: predictions.map(p => ({
         jenis: p.jenis,
         value: p.value,
         timestamp: p.createdAt
-      })) });
+      }))});
     } catch (error) {
       console.error('Terjadi kesalahan saat memuat halaman prediksi:', error);
       res.status(500).render('error', { message: 'Terjadi kesalahan saat memuat halaman prediksi' });
@@ -120,17 +124,12 @@ exports.getData = async (req, res) => {
         const channelId = '2422190';
         const response = await fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=60`);
         const data = await response.json();
-        // data.feeds = data.feeds.map(feedTime=>{
-        //   feedTime.created_at = formatDate(feedTime.created_at);
-        //   return feedTime;
-        // })
         res.json(data);
   }catch(error){
       console.error('Error fetching data from ThingSpeak:', error);
       res.status(500).json({ error: 'Error fetching data' });
   }
 }
-
 exports.getPrediction = async (req, res) => {
   try{
     const lastPrediction = await Promise.all([
