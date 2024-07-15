@@ -15,7 +15,7 @@
     <div class="container" id="container">
         <div class="row justify-content-center">
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coBox">
-                <p class="center">CO</p>
+                <div class="icon-container"></div>
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="coValue"></h3>
                     <p class="value-label">ppm</p>
@@ -23,7 +23,7 @@
                 <p id="coDescription" class="center poppins-regular"></p>
             </div>
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25Box">
-                <p class="center">PM25</p>
+                <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="pm25Value"></h3>
                     <p class="value-label">ppm</p>
@@ -32,18 +32,30 @@
             </div>
         </div>
         <div class="row justify-content-center mt-3">
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0 temp">
                 <p class="center">Temperature</p>
+                <div class="icon-container"></div>
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="tempValue"></h3>
                     <p class="value-label">°C</p>
                 </div>
             </div>
-            <div class="col-12 col-md-5 info-box mb-3 mb-md-0">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0 hum">
                 <p class="center">Humidity</p>
+                <div class="icon-container"></div>
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="humValue"></h3>
                     <p class="value-label">%</p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 col-md-5 info-box mb-3 mb-md-0 ws">
+                <p class="center">WindSpeed</p>
+                <div class="icon-container"></div>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 id="wsValue"></h3>
+                    <p class="value-label">m/s</p>
                 </div>
             </div>
         </div>
@@ -57,9 +69,11 @@
     <br>
     <!-- Konten prediksi -->
     <div class="container bg-second" id="predictionContent">
+        <div><h3 class="center">Prediction next hours</h3></div>
+        <br>
         <div class="row justify-content-center">
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="coPredictionBox">
-                <p class="center">Prediction CO next hours</p>
+                <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="predictionCO"></h3>
                     <p class="value-label">ppm</p>
@@ -67,7 +81,8 @@
                 <p class="center poppins-regular" id="coPredictDesc">Prediction Description CO</p>
             </div>
             <div class="col-12 col-md-5 info-box mb-3 mb-md-0" id="pm25PredictionBox">
-                <p class="center">Prediction PM25 next hours</p>
+                
+                <div class="icon-container"></div> <!-- Tambahkan elemen ini -->
                 <div class="d-flex justify-content-center align-items-center">
                     <h3 id="predictionPM25"></h3>
                     <p class="value-label">ppm</p>
@@ -147,12 +162,13 @@
                 var values2 = data.feeds.map(feed => feed.field2);
                 var values3 = data.feeds.map(feed => feed.field3);
                 var values4 = data.feeds.map(feed => feed.field4);
-                
+                var values5 = data.feeds.map(feed => feed.field5);
 
                 document.getElementById('coValue').innerText = values1[values1.length - 1];
                 document.getElementById('pm25Value').innerText = values2[values2.length - 1];
                 document.getElementById('tempValue').innerText = values3[values3.length - 1];
                 document.getElementById('humValue').innerText = values4[values4.length - 1];
+                document.getElementById('wsValue').innerText = values5[values4.length - 1];
                 var lastUpdatedTime = formatDateTime(lastLabels);
                 document.getElementById('lastUpdatedTime').innerText = lastUpdatedTime;
                 //box information kategori level polutan

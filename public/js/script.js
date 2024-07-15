@@ -173,40 +173,6 @@ document.addEventListener('DOMContentLoaded', function () {
   })();
 
   (function () {
-    Chart.defaults.backgroundColor = '#000';
-    var darkMode = localStorage.getItem('darkMode');
-    var darkModeToggle = document.querySelector('.theme-switcher');
-
-    var enableDarkMode = function enableDarkMode() {
-      document.body.classList.add('darkmode');
-      localStorage.setItem('darkMode', 'enabled');
-    };
-
-    var disableDarkMode = function disableDarkMode() {
-      document.body.classList.remove('darkmode');
-      localStorage.setItem('darkMode', null);
-    };
-
-    if (darkMode === 'enabled') {
-      enableDarkMode();
-    }
-
-    if (darkModeToggle) {
-      darkModeToggle.addEventListener('click', function () {
-        darkMode = localStorage.getItem('darkMode');
-
-        if (darkMode !== 'enabled') {
-          enableDarkMode();
-        } else {
-          disableDarkMode();
-        }
-
-        addData();
-      });
-    }
-  })();
-
-  (function () {
     var checkAll = document.querySelector('.check-all');
     var checkers = document.querySelectorAll('.check');
 
@@ -497,15 +463,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   function addData() {
-    var darkMode = localStorage.getItem('darkMode');
-
-    if (darkMode === 'enabled') {
-      gridLine = '#37374F';
-      titleColor = '#EFF0F6';
-    } else {
       gridLine = '#EEEEEE';
       titleColor = '#171717';
-    }
+    
 
     if (charts.hasOwnProperty('visitors')) {
       charts.visitors.options.scales.x.grid.color = gridLine;

@@ -30,5 +30,10 @@ router.get('/admin', requireAuth, adminController.dashboard);
 router.get('/prediction', requireAuth, mainController.displayPrediction);
 //Route menampilkan semua data pollution yang disimpan dalam satuan jam
 router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
+//Route menampilkan evaluation performance model
+router.get('/evaluation', requireAuth, adminController.getEvaluation);
+//Route membackup dataset yang telah disimpan
+router.get('/backup', requireAuth, adminController.backupData);
+
 
 module.exports = router;

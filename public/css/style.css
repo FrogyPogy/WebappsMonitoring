@@ -1021,15 +1021,16 @@ body {
 /* Basic config for all custom icons: */
 
 .icon {
+  background-size: contain;
   display: inline-block;
   background-repeat: no-repeat;
   background-position: center center;
 }
 
 .logo {
-  background-image: url(../img/svg/Logo.svg);
+  background-image: url(../img/logo_airmind3.svg);
   width: 49px;
-  height: 49px;
+  height: 49px; 
 }
 
 .menu-toggle {
@@ -1051,7 +1052,7 @@ body {
 }
 
 .document {
-  background-image: url(../img/svg/Bulk/Document-white.svg);
+  background-image: url(../img/svg/Bulk/Chart.svg);
   width: 24px;
   height: 24px;
 }
@@ -1069,7 +1070,7 @@ body {
 }
 
 .image {
-  background-image: url(../img/svg/Bulk/Image-white.svg);
+  background-image: url(../img/svg/Bulk/up-trend.svg);
   width: 24px;
   height: 24px;
 }
@@ -1078,6 +1079,12 @@ body {
   width: 24px;
   height: 24px;
   background-image: url(../img/svg/Bulk/Paper-white.svg);
+}
+
+.backup {
+  width: 24px;
+  height: 24px;
+  background-image: url(../img/svg/Bulk/Shield\ Done.svg);
 }
 
 .message {
@@ -1304,7 +1311,7 @@ h3 {
 
 .main-title {
   font-weight: bold;
-  font-size: 24px;
+  font-size: 32px;
   line-height: 1.42;
   color: #171717;
   margin-bottom: 20px;
@@ -1993,7 +2000,7 @@ label {
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  background-color: #0061f7 !important;
+  background-color: #242526 !important;
   width: 253px;
   padding: 20px 15px 37px 20px;
   -webkit-transition: 0.5s all;
@@ -2026,7 +2033,7 @@ label {
 }
 
 .sidebar-body {
-  padding-top: 20px;
+  padding-top: 40px;
 }
 
 .sidebar-body-menu li {
@@ -2043,11 +2050,11 @@ label {
   align-items: center;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  padding: 8px 0;
+  padding: 12px 0;
   opacity: 0.6;
   color: #fff;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 18px;
   line-height: 2.43;
 }
 
