@@ -1,6 +1,47 @@
 <main class="main users chart-page" id="skip-target">
     <div class="container md">
       <h2 class="main-title">Evaluation Model</h2>
+      <p class="poppins-light nb">*Evaluasi model dilakukan menggunakan MAPE (Mean Average Percentage Error)
+        dengan 20 data uji*
+      </p>
+      <% if (success_msg) { %>
+        <p class="success-alert"><%= success_msg %></p>
+      <% } %>
+      <% if (error_msg) { %>
+          <p class="fail-alert"><%= error_msg %></p>
+      <% } %>
+      <% if (models.length > 0) { %>
+      <div class="users-table table-wrapper">
+        <table class="posts-table">
+          <thead>
+            <tr class="users-table-info">
+              <th>
+                <label class="users-table__checkbox">
+                  <p>#</p>
+                </label>
+              </th>
+              <th>Jenis Model</th>
+              <th>Last Trained</th>
+              <th>Performance</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% models.forEach((model, idx) => { %>
+            <tr>
+              <td><%= idx + 1 %></td>
+              <td><%= model.name %></td>
+              <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
+              <td><%= model.performance %></td>
+              <td><a class="btn btn-primary" href="#">Evaluate</a></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% }else { %>
+          <p>No models available</p>
+        <% } %>
+      </div>
     </div>
 </main>
 <footer class="text-white py-3">

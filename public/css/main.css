@@ -83,6 +83,11 @@ footer ul li a{
     text-decoration: none;
     border-radius: 15px;
 }
+.poppins-light{
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
 
 .poppins-regular {
     font-family: "Poppins", sans-serif;
@@ -112,6 +117,13 @@ url image sebagai berikut:
     border: 2px solid #e4e0e0;
     border-radius: 10px;
     background-color: #f9f9f9;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.nb{
+    background-color:#e4e0e0;
+    font-size: 11px;
+    padding: 10px;
     margin-bottom: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -193,6 +205,12 @@ url image sebagai berikut:
     .sidebar{
         background-color: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(10px);
+    }
+}
+@media (min-width: 992px){
+    .icon-container{
+        width: 50px;
+        height: 50px;
     }
 }
 #i-header-1{

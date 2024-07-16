@@ -78,3 +78,8 @@ exports.createUser = async (req, res) => {
     }
 };
 
+//destroy jwt cookies
+exports.signOut = (req, res) => {
+    res.cookie('jwt', '', { maxAge: 1 });
+    res.redirect('/');
+};

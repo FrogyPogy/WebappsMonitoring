@@ -87,26 +87,6 @@ exports.initializeModel = async (req, res) => {
     res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
   }
 };
-//DisplayAirPollutinPrediction
-exports.displayPrediction = async (req, res) => {
-    //Ambil prediksi dari database resultPrediction
-    try {
-      const locals = {
-        title: 'Prediction - AIRMIND',
-        description:'Air Pollution Monitoring and Prediction System',
-        layout: './layouts/admin'
-      };
-      const predictions = await resultPrediction.find({});
-      res.render('admin/prediction', { ...locals, predictions: predictions.map(p => ({
-        jenis: p.jenis,
-        value: p.value,
-        timestamp: p.createdAt
-      }))});
-    } catch (error) {
-      console.error('Terjadi kesalahan saat memuat halaman prediksi:', error);
-      res.status(500).render('error', { message: 'Terjadi kesalahan saat memuat halaman prediksi' });
-    }
-};
 
 //formatDate
 //untuk memformat tipe data waktu menjadi hari dan jam

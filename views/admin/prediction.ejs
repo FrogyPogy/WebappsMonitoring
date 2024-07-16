@@ -1,5 +1,5 @@
 <div class="main-wrapper">
-  <h1 class="mt-3 text-center poppins-semibold">History Prediction</h1>
+  <h1 class="mt-3 mb-3 text-center poppins-semibold">History Prediction</h1>
   <div class="container">
     <div class="d-flex mb-3">
       <a href="/initializeModel" class="btn btn-outline-info me-auto">
@@ -8,10 +8,7 @@
       <a href="/getDataSaved" class="btn btn-outline-warning">
         See Data Pollution
       </a>
-      
     </div>
-    
-    
     <% if (success_msg) { %>
       <p class="success-alert">
         <%= success_msg %>
@@ -22,45 +19,45 @@
         <%= error_msg %>
       </p>
     <% } %>
-    <% if (predictions.length > 0) { %>
-      <table class="table table-striped">
+    <div class="users-table table-wrapper">
+    <% if (combinedData.length > 0) { %>
+      <table class="posts-table">
         <thead>
-          <tr>
+          <tr class="users-table-info">
             <th scope="col">#</th>
             <th scope="col">Timestamp</th>
-            <th scope="col">Jenis</th>
-            <th scope="col">Value</th>
+            <th scope="col">Predicted CO</th>
+            <th scope="col">Predicted PM2.5</th>
+            <th scope="col">Actual CO</th>
+            <th scope="col">Actual PM2.5</th>
           </tr>
         </thead>
         <tbody>
-          <% predictions.forEach((prediction, idx) => { %>
+          <% combinedData.forEach((data, idx) => { %>
           <tr>
             <td><%= idx + 1 %></td>
-            <td><%= new Date(prediction.timestamp).toLocaleString() %></td>
-            <td><%= prediction.jenis %></td>
-            <td><%= prediction.value.toFixed(2) %></td>
+            <td><%= new Date(data.timestamp).toLocaleString() %></td>
+            <td><%= data.predictedCO !== null ? data.predictedCO.toFixed(2) : 'N/A' %></td>
+            <td><%= data.predictedPM25 !== null ? data.predictedPM25.toFixed(2) : 'N/A' %></td>
+            <td><%= data.actualCO !== null ? data.actualCO.toFixed(2) : 'N/A' %></td>
+            <td><%= data.actualPM25 !== null ? data.actualPM25.toFixed(2) : 'N/A' %></td>
           </tr>
         <% }) %>
         </tbody>
       </table>
     <% } else { %>
+    </div>
       <p>No prediction results available.</p>
     <% } %>  
   </div>
 </div>
 <footer class="text-white py-3">
-      
   <ul class="nav justify-content-center border-bottom pb-3 mb-3">
     <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Home</a></li>
     <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Contacts</a></li>
     <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">About</a></li>
   </ul>
   <p class="text-white text-center text-muted">© 2024 AIRMIND, Inc</p>
-  
 </footer>
-<!-- Chart library -->
-<!-- <script src="./plugins/chart.min.js"></script> -->
-<!-- Icons library -->
 <script src="plugins/feather.min.js"></script>
-<!-- Custom scripts -->
 <script src="/js/script.js"></script>

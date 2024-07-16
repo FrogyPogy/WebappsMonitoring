@@ -14,6 +14,9 @@ const resultModelSchema = new Schema({
     name:{
         type: string,
         required: true
+    },
+    performance:{
+        type: Number
     }
 });
 

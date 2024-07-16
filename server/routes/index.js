@@ -27,13 +27,12 @@ router.get('/signOut',loginController.signOut);
 //Route admin
 router.get('/admin', requireAuth, adminController.dashboard);
 //Route menampilkan seluruh hasil prediksi
-router.get('/prediction', requireAuth, mainController.displayPrediction);
+router.get('/prediction', requireAuth, adminController.displayPrediction);
 //Route menampilkan semua data pollution yang disimpan dalam satuan jam
 router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 //Route menampilkan evaluation performance model
 router.get('/evaluation', requireAuth, adminController.getEvaluation);
 //Route membackup dataset yang telah disimpan
 router.get('/backup', requireAuth, adminController.backupData);
-
 
 module.exports = router;
