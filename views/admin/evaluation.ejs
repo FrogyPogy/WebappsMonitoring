@@ -33,7 +33,7 @@
               <td><%= model.name %></td>
               <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
               <td><%= model.performance %></td>
-              <td><a class="btn btn-primary" href="#">Evaluate</a></td>
+              <td><a class="rounded-4 btn btn-primary btn-sm signBtn" href="#"><span><i class="bi bi-graph-up"></i></span> evaluate</a></td>
             </tr>
             <% }) %>
           </tbody>

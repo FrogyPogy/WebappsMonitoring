@@ -110,6 +110,7 @@ exports.getData = async (req, res) => {
       res.status(500).json({ error: 'Error fetching data' });
   }
 }
+
 exports.getPrediction = async (req, res) => {
   try{
     const lastPrediction = await Promise.all([
