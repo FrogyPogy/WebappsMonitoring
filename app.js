@@ -6,6 +6,7 @@ const connectDB = require('./server/config/db');
 const schedule = require('./server/utils/scheduler');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
 //middleware for flash error or success message
 const flash = require('connect-flash');
 

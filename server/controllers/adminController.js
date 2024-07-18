@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
-const user = require('../models/user');
 const dataset = require('../models/dataset');
 const resultPrediction = require('../models/resultPrediction');
 const resultModel = require('../models/resultModel');
+const path = require('path');
+const datatrain = require('../models/datatrain');
+const fs = require('fs');
 
 exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
     try{
@@ -22,14 +24,97 @@ exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek 
     }
 };
 
+exports.uploadData = async(req, res) => {
+    try{
+        const locals = {
+            title: 'AIRMIND - Upload',
+            description: 'Air Pollution Monitoring and Prediction System',
+            layout: './layouts/admin'
+        }
+        res.render('admin/uploadData', locals);
+    }catch(error){
+        console.error('Tidak dapat memuat halaman Upload', error);
+        res.status(500).render('error',{message:'Tidak dapat memuat halaman Upload'});
+    }
+};
+
+exports.handleUploadData = (req, res) => {
+    const filePath = path.join(__dirname, '..', req.file.path);
+    
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).send('Error reading file');
+        }
+
+        try {
+            dataset.deleteMany({});
+            datatrain.deleteMany({});
+            const jsonData = JSON.parse(data);
+            
+            // Proses data JSON sesuai kebutuhan Anda
+            // Simpan data ke dalam model dataset dan datatrain
+            for (const item of jsonData) {
+                const newDataPoint = new dataset({
+                value: {
+                    co: parseFloat(item.co),
+                    pm25: parseFloat(item.pm25),
+                    temperature: parseFloat(item.temperature),
+                    humidity: parseFloat(item.humidity),
+                    windSpeed: parseFloat(item.windspeed)
+                },
+                timestamp: new Date(item.created_at),
+                hours: new Date(item.created_at).getHours()
+                });
+                newDataPoint.save();
+
+                const newDatatrain = new datatrain({
+                value: {
+                    co: parseFloat(item.co),
+                    pm25: parseFloat(item.pm25),
+                    temperature: parseFloat(item.temperature),
+                    humidity: parseFloat(item.humidity),
+                    windSpeed: parseFloat(item.windspeed)
+                },
+                timestamp: new Date(item.created_at),
+                hours: new Date(item.created_at).getHours(),
+                jenis: 'datatrain'
+                });
+                newDatatrain.save();
+            }
+
+            // Menghapus file setelah diproses
+            fs.unlink(filePath, (unlinkErr) => {
+                if (unlinkErr) {
+                    console.error('Error deleting file:', unlinkErr);
+                }
+            });
+
+            res.send('File uploaded and processed successfully');
+        } catch (parseErr) {
+            console.error('Error parsing JSON:', parseErr);
+            res.status(400).send('Invalid JSON format');
+        }
+    });
+};
+
 exports.getDataSaved = async (req, res) => {
     try{
+        const datasets = await fetchDataset(); // Panggil fungsi fetchDataset untuk mendapatkan data
+        const viewdataset = datasets.map(item => ({
+            co: item.value.co,
+            pm25: item.value.pm25,
+            temp:item.value.temperature,
+            hum:item.value.humidity,
+            windSpeed:item.value.windSpeed,
+            timestamp:item.timestamp,
+        }));
         const locals = {
             title: 'AIRMIND - Data Pollution Saved',
             description:'Air Pollution Monitoring and Prediction System',
             layout: './layouts/admin'
         };
-        res.render('admin/viewDataSaved', locals);
+        res.render('admin/viewDataSaved', {...locals, viewdataset});
     }catch (error){
         console.error('terjadi kesalahan saat memuat halaman Dataset:', error);
         res.status(500).render('error',{message:'Terjadi kesalahan saat memuat halaman dataset'});
@@ -175,7 +260,7 @@ exports.backupData = async (req, res) => {
         res.status(500).render('error',{message:'Terjadi kesalahan saat memuat halaman backup dataset'});
     }
 };
-
+//Get total data saved in dataset 
 const getDataset = async () => {
     try{
         const totalData = await dataset.countDocuments({});

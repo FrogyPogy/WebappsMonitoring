@@ -4,6 +4,8 @@ const mainController = require('../controllers/mainController');
 const adminController = require('../controllers/adminController');
 const loginController = require('../controllers/loginController');
 const requireAuth = require('../middleware/authMiddleware');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 /** Routes app*/
 router.get('/',mainController.homepage);
@@ -34,5 +36,7 @@ router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 router.get('/evaluation', requireAuth, adminController.getEvaluation);
 //Route membackup dataset yang telah disimpan
 router.get('/backup', requireAuth, adminController.backupData);
+router.get('/uploadData', requireAuth, adminController.uploadData);
+router.post('/uploadData', requireAuth, upload.single('dataset'), adminController.handleUploadData);
 
 module.exports = router;

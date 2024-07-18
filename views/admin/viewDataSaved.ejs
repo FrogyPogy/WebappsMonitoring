@@ -1,6 +1,48 @@
 <main class="main users chart-page" id="skip-target">
     <div class="container md">
       <h2 class="main-title">Dataset view</h2>
+      <% if (success_msg) { %>
+        <p class="success-alert"><%= success_msg %></p>
+      <% } %>
+      <% if (error_msg) { %>
+          <p class="fail-alert"><%= error_msg %></p>
+      <% } %>
+      <% if (viewdataset.length > 0) { %>
+      <div class="users-table table-wrapper">
+        <table class="posts-table">
+          <thead>
+            <tr class="users-table-info">
+              <th>
+                <label class="users-table__checkbox">
+                  <p>#</p>
+                </label>
+              </th>
+              <th>Time</th>
+              <th>CO<p class="value-label"> ppm</p></th>
+              <th>PM25<p class="value-label"> ppm</p></th>
+              <th>Temp<p class="value-label"> °C</p></th>
+              <th>Hum<p class="value-label"> %</p></th>
+              <th>WindSpeed<p class="value-label"> m/s</p></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% viewdataset.forEach((dataset, idx) => { %>
+            <tr>
+              <td><%= idx + 1 %></td>
+              <td><%= new Date(dataset.timestamp).toLocaleString() %></td>
+              <td><%= dataset.co.toFixed(2) %></td>
+              <td><%= dataset.pm25.toFixed(2) %></td>
+              <td><%= dataset.temp.toFixed(2) %></td>
+              <td><%= dataset.hum.toFixed(2) %></td>
+              <td><%= dataset.windSpeed %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% }else { %>
+          <p>No dataset available</p>
+        <% } %>
+      </div>
     </div>
 </main>
 <footer class="text-white py-3">
