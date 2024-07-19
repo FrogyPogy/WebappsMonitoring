@@ -38,64 +38,68 @@ exports.uploadData = async(req, res) => {
     }
 };
 
-exports.handleUploadData = (req, res) => {
-    const filePath = path.join(__dirname, '..', req.file.path);
-    
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return res.status(500).send('Error reading file');
+exports.handleUploadData = async(req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded');
+    }
+    const filePath = path.join(req.file.destination, req.file.filename);
+
+    try {
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        const jsonData = JSON.parse(data);
+
+        //cek apakah dataset kosong?
+        const datasetCount = await dataset.countDocuments({});
+        const datatrainCount = await datatrain.countDocuments({});
+
+        if (datasetCount > 0 || datatrainCount > 0){
+            //hapus dataset dan datatrain lama
+            await dataset.deleteMany({});
+            await datatrain.deleteMany({});
         }
+        // Urutkan data JSON berdasarkan created_at
+        jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-        try {
-            dataset.deleteMany({});
-            datatrain.deleteMany({});
-            const jsonData = JSON.parse(data);
-            
-            // Proses data JSON sesuai kebutuhan Anda
-            // Simpan data ke dalam model dataset dan datatrain
-            for (const item of jsonData) {
-                const newDataPoint = new dataset({
-                value: {
-                    co: parseFloat(item.co),
-                    pm25: parseFloat(item.pm25),
-                    temperature: parseFloat(item.temperature),
-                    humidity: parseFloat(item.humidity),
-                    windSpeed: parseFloat(item.windspeed)
-                },
-                timestamp: new Date(item.created_at),
-                hours: new Date(item.created_at).getHours()
-                });
-                newDataPoint.save();
+        // Proses data JSON
 
-                const newDatatrain = new datatrain({
-                value: {
-                    co: parseFloat(item.co),
-                    pm25: parseFloat(item.pm25),
-                    temperature: parseFloat(item.temperature),
-                    humidity: parseFloat(item.humidity),
-                    windSpeed: parseFloat(item.windspeed)
-                },
-                timestamp: new Date(item.created_at),
-                hours: new Date(item.created_at).getHours(),
-                jenis: 'datatrain'
-                });
-                newDatatrain.save();
-            }
-
-            // Menghapus file setelah diproses
-            fs.unlink(filePath, (unlinkErr) => {
-                if (unlinkErr) {
-                    console.error('Error deleting file:', unlinkErr);
-                }
+        for (const item of jsonData) {
+            const newDataPoint = new dataset({
+            value: {
+                co: parseFloat(item.co).toFixed(2),
+                pm25: parseFloat(item.pm25).toFixed(2),
+                temperature: parseFloat(item.temperature).toFixed(2),
+                humidity: parseFloat(item.humidity).toFixed(2),
+                windSpeed: parseFloat(item.windspeed).toFixed(2)
+            },
+            timestamp: new Date(item.created_at),
+            hours: new Date(item.created_at).getHours()
             });
+            await newDataPoint.save();
 
-            res.send('File uploaded and processed successfully');
+            const newDatatrain = new datatrain({
+            value: {
+                co: parseFloat(item.co).toFixed(2),
+                pm25: parseFloat(item.pm25).toFixed(2),
+                temperature: parseFloat(item.temperature).toFixed(2),
+                humidity: parseFloat(item.humidity).toFixed(2),
+                windSpeed: parseFloat(item.windspeed).toFixed(2)
+            },
+            timestamp: new Date(item.created_at),
+            hours: new Date(item.created_at).getHours(),
+            jenis: 'datatrain'
+            });
+            await newDatatrain.save();
+        }
+            
+        // Menghapus file setelah diproses
+        await fs.promises.unlink(filePath);
+        
+        res.send('File uploaded and processed successfully');
+
         } catch (parseErr) {
             console.error('Error parsing JSON:', parseErr);
             res.status(400).send('Invalid JSON format');
-        }
-    });
+        };
 };
 
 exports.getDataSaved = async (req, res) => {
@@ -175,16 +179,19 @@ exports.displayPrediction = async (req, res) => {
         };
 
         // Gabungkan data prediksi dan data aktual berdasarkan tanggal dan jam
-        const combinedData = combinedPredictionsArray.map(prediction => {
+        const combinedData = combinedPredictionsArray.reduce((acc, prediction) => {
             const actual = datasets.find(dataset => compareDateHour(prediction.timestamp, dataset.timestamp)) || {};
-            return {
-                timestamp: prediction.timestamp,
-                predictedCO: prediction.predictedCO,
-                predictedPM25: prediction.predictedPM25,
-                actualCO: actual.value ? actual.value.co : null,
-                actualPM25: actual.value ? actual.value.pm25 : null
-            };
-        });
+            if (actual){
+                acc.push({
+                    timestamp: prediction.timestamp,
+                    predictedCO: prediction.predictedCO,
+                    predictedPM25: prediction.predictedPM25,
+                    actualCO: actual.value ? actual.value.co : null,
+                    actualPM25: actual.value ? actual.value.pm25 : null
+                })
+            }
+            return acc;
+        }, []);
 
         res.render('admin/prediction', {
             ...locals,
@@ -196,25 +203,6 @@ exports.displayPrediction = async (req, res) => {
     }
 };
 
-// exports.displayPrediction = async (req, res) => {
-//     //Ambil prediksi dari database resultPrediction
-//     try {
-//       const locals = {
-//         title: 'Prediction - AIRMIND',
-//         description:'Air Pollution Monitoring and Prediction System',
-//         layout: './layouts/admin'
-//       };
-//       const predictions = await resultPrediction.find({});
-//       res.render('admin/prediction', { ...locals, predictions: predictions.map(p => ({
-//         jenis: p.jenis,
-//         value: p.value,
-//         timestamp: p.createdAt
-//       }))});
-//     } catch (error) {
-//       console.error('Terjadi kesalahan saat memuat halaman prediksi:', error);
-//       res.status(500).render('error', { message: 'Terjadi kesalahan saat memuat halaman prediksi' });
-//     }
-// };
 
 exports.getEvaluation = async (req, res) => {
     try{
