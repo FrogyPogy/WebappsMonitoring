@@ -37,6 +37,45 @@ exports.uploadData = async(req, res) => {
         res.status(500).render('error',{message:'Tidak dapat memuat halaman Upload'});
     }
 };
+exports.uploadDatatest = async(req, res) => {
+    if (!req.file){
+        return res.status(400).send('No file uploaded');
+    }
+    const filePath = path.join(req.file.destination, req.file.filename);
+
+    try{
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        const jsonData = JSON.parse(data);
+
+        await datatrain.deleteMany({jenis: 'datatest'});
+        // Urutkan data JSON berdasarkan created_at
+        jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        for (const item of jsonData){
+            const newDatatest = new datatrain({
+                value: {
+                    co: parseFloat(item.co).toFixed(2),
+                    pm25: parseFloat(item.pm25).toFixed(2),
+                    temperature: parseFloat(item.temperature).toFixed(2),
+                    humidity: parseFloat(item.humidity).toFixed(2),
+                    windSpeed: parseFloat(item.windspeed).toFixed(2)
+                },
+                timestamp: new Date(item.created_at),
+                hours: new Date(item.created_at).getHours(),
+                jenis: 'datatest'
+                });
+                await newDatatest.save();
+        }
+
+         // Menghapus file setelah diproses
+         await fs.promises.unlink(filePath);
+        
+         res.send('Data test uploaded and processed successfully');
+    }catch(error){
+        console.error('Error parsing JSON:', error);
+        res.status(400).send('Invalid JSON format');
+    }
+};
 
 exports.handleUploadData = async(req, res) => {
     if (!req.file) {
@@ -94,7 +133,7 @@ exports.handleUploadData = async(req, res) => {
         // Menghapus file setelah diproses
         await fs.promises.unlink(filePath);
         
-        res.send('File uploaded and processed successfully');
+        res.send('Dataset uploaded and processed successfully');
 
         } catch (parseErr) {
             console.error('Error parsing JSON:', parseErr);
