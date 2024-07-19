@@ -3,6 +3,8 @@ const dataset = require('../models/dataset');
 const regressionModel = require('../models/regressionModel');
 const resultPrediction = require('../models/resultPrediction');
 const init = require('../models/init');
+const resultModel = require('../models/resultModel');
+const datatrain = require('../models/datatrain');
 
 exports.homepage = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
   try{
@@ -74,28 +76,38 @@ exports.initializeData = async (req, res) => {
   };
 exports.initializeModel = async (req, res) => {
   try{
-    //ambil 100 data pertama dari dataset.js sebagai dataset model pertama;
-    const firstDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
+    //cek apakah resultModel kosong?
+    const resultModelCount = await resultModel.countDocuments({});
+
+    if (resultModelCount > 0){
+      //Hapus semua model jika ada:
+      await resultModel.deleteMany({});
+    }
+    
+    //ambil seluruh data dari datatrain
+    const firstDataset = await datatrain.find({jenis: 'datatrain'}).sort({ timestamp: 1 }).limit(100);
     await regressionModel.firstTrainPM25(firstDataset);
     await regressionModel.firstTrain(firstDataset);
   
     req.flash('success_msg', 'model trained successfully');
-    res.redirect('prediction'); //rendering index.ejs in views
+    res.redirect('/prediction'); //rendering index.ejs in views
   }catch(error){
     req.flash('error_msg', 'fail to train model');
     res.redirect('/prediction');
-    res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
+    // res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
   }
 };
 
+
+
 //formatDate
 //untuk memformat tipe data waktu menjadi hari dan jam
-function formatDate(dateStr){
-  const date = new Date(dateStr);
-  const hours = date.getHours();
-  const day = date.getDate();
-  return `${hours}:00, ${day}`;
-}
+// function formatDate(dateStr){
+//   const date = new Date(dateStr);
+//   const hours = date.getHours();
+//   const day = date.getDate();
+//   return `${hours}:00, ${day}`;
+// }
 
 //Get data from thingspeak 
 exports.getData = async (req, res) => {
@@ -119,6 +131,7 @@ exports.getPrediction = async (req, res) => {
     ]);
     res.json(lastPrediction);
   }catch(error){
+    req.flash('error_msg', 'Belum ada model prediksi');
     res.status(500).json({ error: 'Error fetching data from Prediction' });
   }
 }

@@ -94,7 +94,7 @@ exports.handleUploadData = async(req, res) => {
         if (datasetCount > 0 || datatrainCount > 0){
             //hapus dataset dan datatrain lama
             await dataset.deleteMany({});
-            await datatrain.deleteMany({});
+            await datatrain.deleteMany({jenis: 'datatrain'});
         }
         // Urutkan data JSON berdasarkan created_at
         jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -273,6 +273,70 @@ const getModel = async() => {
         throw error;
     }
 };
+
+exports.runEvaluation = async (req, res) => {
+    try{
+      const recentData = await datatrain.find({jenis: 'datatest'});
+    //   const latestData = await regressionModel.isLatestData(recentData[recentData.length-1]);
+
+      for (const item of recentData) {
+        var co = item.value.co;
+        var pm25 = item.value.pm25;
+        var temperature = item.value.temperature;
+        var humidity = item.value.humidity;
+        var windSpeed = item.value.windSpeed;
+        var nextHour = new Date(item.hours);
+      }  
+
+      if(latestData){
+        
+        const latestFeed = recentData[recentData.length - 1];
+        const latestHour = new Date(latestFeed.created_at).getHours();
+        
+        const prevHour = (latestHour - 1 + 24) % 24;
+        //filter data berdasarkan jam terbaru dan satu jam sebelumnya
+        const filterData = recentData.filter(feed => {
+          const feedHour = new Date(feed.created_at).getHours();
+          return feedHour === latestHour || feedHour === prevHour;
+        }) 
+  
+        //pisahkan nilai dari masing" field
+        const fieldCO = filterData.map(feed => parseFloat(feed.field1)).filter(value => !isNaN(value));
+        const fieldPM25 = filterData.map(feed => parseFloat(feed.field2)).filter(value => !isNaN(value));
+        const fieldTemp  = filterData.map(feed => parseFloat(feed.field3)).filter(value => !isNaN(value));
+        const fieldHum = filterData.map(feed => parseFloat(feed.field4)).filter(value => !isNaN(value));
+        const fieldWS = filterData.map(feed => parseFloat(feed.field5)).filter(value => !isNaN(value));
+        const nextHour = (latestHour+1) % 24;
+        const data = [nextHour, fieldCO, fieldPM25, fieldTemp, fieldHum, fieldWS];
+        
+        const time = new Date(latestFeed.created_at);
+        // data yang siap untuk diprediksi
+  
+        const readyPredict = calcMedian(data);
+        console.log(readyPredict);
+        const predictedValue = await regressionModel.predictAirPollution(readyPredict);
+        //menyimpan data baru kedalam dataset
+        if(predictedValue){
+          
+          const newDataPoint = new dataset({
+            value: {
+              co: parseFloat(readyPredict[2]),
+              pm25: parseFloat(readyPredict[1]),
+              temperature: parseFloat(readyPredict[3]),
+              humidity: parseFloat(readyPredict[4]),
+              windSpeed: parseFloat(readyPredict[5])
+            },
+            timestamp: time,
+            hours: latestHour
+          });
+          await newDataPoint.save();
+        }
+      }
+    }catch(error){
+      console.error('Terjadi kesalahan saat pengambilan data atau menyimpan data');
+      throw error;
+    }
+  }
 
 exports.backupData = async (req, res) => {
     try{
