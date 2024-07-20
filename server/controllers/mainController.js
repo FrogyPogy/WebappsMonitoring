@@ -4,7 +4,6 @@ const regressionModel = require('../models/regressionModel');
 const resultPrediction = require('../models/resultPrediction');
 const init = require('../models/init');
 const resultModel = require('../models/resultModel');
-const datatrain = require('../models/datatrain');
 
 exports.homepage = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
   try{
@@ -85,7 +84,7 @@ exports.initializeModel = async (req, res) => {
     }
     
     //ambil seluruh data dari datatrain
-    const firstDataset = await datatrain.find({jenis: 'datatrain'}).sort({ timestamp: 1 }).limit(100);
+    const firstDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
     await regressionModel.firstTrainPM25(firstDataset);
     await regressionModel.firstTrain(firstDataset);
   

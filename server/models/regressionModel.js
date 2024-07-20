@@ -44,6 +44,36 @@ module.exports = {
             throw error;
         }  
     },
+    predictTest: async (data) => {
+      try {
+        /*format input Data yang digunakan seperti predictAirPollution()*/
+        // Coba memuat model regresi dari database resultModel
+        const fetchModelCO = await resultModel.findOne({ name: 'modelCO' }).sort({ lastTrainedAt: -1 }).limit(1);
+        const fetchModelPM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({ lastTrainedAt: -1 }).limit(1);
+        const coeffCO = fetchModelCO.model.flat();
+        const coeffPM25 = fetchModelPM25.model.flat();
+        var dataPM25 = data;
+        // const temp = dataPM25[1];
+        // const dataPM25
+        [dataPM25[1], dataPM25[2]] = [dataPM25[2], dataPM25[1]];
+        
+        if (fetchModelCO && fetchModelPM25) {
+          const predictionCO = math.abs(math.multiply(data, coeffCO));
+          const predictionPM25 = math.abs(math.multiply(dataPM25, coeffPM25));
+          // Simpan hasil prediksi yang baru
+          const result = [predictionCO, predictionPM25];
+          
+          return result;
+        }
+        else{
+          // Jika model belum ada, kembalikan null
+          return null;
+        }
+      }catch(error){
+        console.error('Terjadi kesalahan memprediksi saat tahap evaluasi:', error);
+        throw error;
+      }
+    },
     isLatestData: async (data) => { //Cek apakah data dari thingspeak benar terbaru? 
       const lastData = await dataset.find({}).sort({timestamp: -1}).limit(1);
       if (Math.abs(new Date(lastData[0].timestamp).getTime() - new Date(data.created_at).getTime()) > 10*1000){

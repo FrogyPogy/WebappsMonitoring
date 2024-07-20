@@ -3,7 +3,7 @@ const dataset = require('../models/dataset');
 const resultPrediction = require('../models/resultPrediction');
 const resultModel = require('../models/resultModel');
 const path = require('path');
-const datatrain = require('../models/datatrain');
+const datatest = require('../models/datatest');
 const fs = require('fs');
 
 exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
@@ -37,7 +37,7 @@ exports.uploadData = async(req, res) => {
         res.status(500).render('error',{message:'Tidak dapat memuat halaman Upload'});
     }
 };
-exports.uploadDatatest = async(req, res) => {
+exports.uploadDatatest = async(req, res) => {//Masih ada perbaikan fungsi jangan dipakai dahulu
     if (!req.file){
         return res.status(400).send('No file uploaded');
     }
@@ -47,7 +47,7 @@ exports.uploadDatatest = async(req, res) => {
         const data = await fs.promises.readFile(filePath, 'utf8');
         const jsonData = JSON.parse(data);
 
-        await datatrain.deleteMany({jenis: 'datatest'});
+        await datatest.deleteMany({});
         // Urutkan data JSON berdasarkan created_at
         jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
@@ -60,9 +60,12 @@ exports.uploadDatatest = async(req, res) => {
                     humidity: parseFloat(item.humidity).toFixed(2),
                     windSpeed: parseFloat(item.windspeed).toFixed(2)
                 },
+                actual: {
+                  actualco: parseFloat(item.actualco).toFixed(2),
+                  actualpm25: parseFloat(item.actualpm25).toFixed(2)  
+                },
                 timestamp: new Date(item.created_at),
-                hours: new Date(item.created_at).getHours(),
-                jenis: 'datatest'
+                hours: new Date(item.created_at).getHours()
                 });
                 await newDatatest.save();
         }
@@ -77,7 +80,7 @@ exports.uploadDatatest = async(req, res) => {
     }
 };
 
-exports.handleUploadData = async(req, res) => {
+exports.uploadDataset = async(req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded');
     }
@@ -89,12 +92,10 @@ exports.handleUploadData = async(req, res) => {
 
         //cek apakah dataset kosong?
         const datasetCount = await dataset.countDocuments({});
-        const datatrainCount = await datatrain.countDocuments({});
 
-        if (datasetCount > 0 || datatrainCount > 0){
+        if (datasetCount > 0){
             //hapus dataset dan datatrain lama
             await dataset.deleteMany({});
-            await datatrain.deleteMany({jenis: 'datatrain'});
         }
         // Urutkan data JSON berdasarkan created_at
         jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -114,20 +115,6 @@ exports.handleUploadData = async(req, res) => {
             hours: new Date(item.created_at).getHours()
             });
             await newDataPoint.save();
-
-            const newDatatrain = new datatrain({
-            value: {
-                co: parseFloat(item.co).toFixed(2),
-                pm25: parseFloat(item.pm25).toFixed(2),
-                temperature: parseFloat(item.temperature).toFixed(2),
-                humidity: parseFloat(item.humidity).toFixed(2),
-                windSpeed: parseFloat(item.windspeed).toFixed(2)
-            },
-            timestamp: new Date(item.created_at),
-            hours: new Date(item.created_at).getHours(),
-            jenis: 'datatrain'
-            });
-            await newDatatrain.save();
         }
             
         // Menghapus file setelah diproses
@@ -276,64 +263,27 @@ const getModel = async() => {
 
 exports.runEvaluation = async (req, res) => {
     try{
-      const recentData = await datatrain.find({jenis: 'datatest'});
-    //   const latestData = await regressionModel.isLatestData(recentData[recentData.length-1]);
-
+      const recentData = await datatest.find({});
+      //const latestData = await regressionModel.isLatestData(recentData[recentData.length-1]);
+      
+      //const predictedValue; untuk menampung hasil prediksi seluruh data
       for (const item of recentData) {
-        var co = item.value.co;
-        var pm25 = item.value.pm25;
-        var temperature = item.value.temperature;
-        var humidity = item.value.humidity;
-        var windSpeed = item.value.windSpeed;
-        var nextHour = new Date(item.hours);
-      }  
-
-      if(latestData){
-        
-        const latestFeed = recentData[recentData.length - 1];
-        const latestHour = new Date(latestFeed.created_at).getHours();
-        
-        const prevHour = (latestHour - 1 + 24) % 24;
-        //filter data berdasarkan jam terbaru dan satu jam sebelumnya
-        const filterData = recentData.filter(feed => {
-          const feedHour = new Date(feed.created_at).getHours();
-          return feedHour === latestHour || feedHour === prevHour;
-        }) 
-  
-        //pisahkan nilai dari masing" field
-        const fieldCO = filterData.map(feed => parseFloat(feed.field1)).filter(value => !isNaN(value));
-        const fieldPM25 = filterData.map(feed => parseFloat(feed.field2)).filter(value => !isNaN(value));
-        const fieldTemp  = filterData.map(feed => parseFloat(feed.field3)).filter(value => !isNaN(value));
-        const fieldHum = filterData.map(feed => parseFloat(feed.field4)).filter(value => !isNaN(value));
-        const fieldWS = filterData.map(feed => parseFloat(feed.field5)).filter(value => !isNaN(value));
-        const nextHour = (latestHour+1) % 24;
-        const data = [nextHour, fieldCO, fieldPM25, fieldTemp, fieldHum, fieldWS];
-        
-        const time = new Date(latestFeed.created_at);
-        // data yang siap untuk diprediksi
-  
-        const readyPredict = calcMedian(data);
-        console.log(readyPredict);
-        const predictedValue = await regressionModel.predictAirPollution(readyPredict);
-        //menyimpan data baru kedalam dataset
-        if(predictedValue){
-          
-          const newDataPoint = new dataset({
-            value: {
-              co: parseFloat(readyPredict[2]),
-              pm25: parseFloat(readyPredict[1]),
-              temperature: parseFloat(readyPredict[3]),
-              humidity: parseFloat(readyPredict[4]),
-              windSpeed: parseFloat(readyPredict[5])
-            },
-            timestamp: time,
-            hours: latestHour
-          });
-          await newDataPoint.save();
+        var co = parseFloat(item.value.co);
+        var pm25 = parseFloat(item.value.pm25);
+        var temperature = parseFloat(item.value.temperature);
+        var humidity = parseFloat(item.value.humidity);
+        var windSpeed = parseFloat(item.value.windSpeed);
+        var hours = new Date(item.hours);
+        var nextHour = (hours + 1) % 24;
+        var data = [nextHour, co, pm25, temperature, humidity, windSpeed];
+        const predicted = await regressionModel.predictTest(readyPredict);
+        if(predicted){
+            //await push to predictedValue
         }
-      }
+      }  
+      //predictedValue
     }catch(error){
-      console.error('Terjadi kesalahan saat pengambilan data atau menyimpan data');
+      console.error('Terjadi kesalahan saat pengambilan datatest');
       throw error;
     }
   }

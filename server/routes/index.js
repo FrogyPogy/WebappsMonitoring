@@ -38,7 +38,7 @@ router.get('/evaluation', requireAuth, adminController.getEvaluation);
 router.get('/backup', requireAuth, adminController.backupData);
 //Route upload Dataset, datatest dan data train
 router.get('/uploadData', requireAuth, adminController.uploadData);
-router.post('/uploadData', requireAuth, upload.single('dataset'), adminController.handleUploadData);
+router.post('/uploadData', requireAuth, upload.single('dataset'), adminController.uploadDataset);
 router.post('/uploadDatatest',requireAuth, upload.single('dataset-test'), adminController.uploadDatatest);
 
 module.exports = router;
