@@ -3,6 +3,7 @@ const cron = require('node-cron');
 const regressionModel = require('../models/regressionModel');
 const dataset = require ('../models/dataset');
 const math = require('mathjs');
+const resultPrediction = require('../models/resultPrediction');
 
 module.exports = {
     start: () => {
@@ -41,7 +42,7 @@ async function updateAndPredict(){
       
       const prevHour = (latestHour - 1 + 24) % 24;
       //filter data berdasarkan jam terbaru dan satu jam sebelumnya
-      const filterData = recentData.filter(feed => {
+      const filterData = recentData.filter(feed => { 
         const feedHour = new Date(feed.created_at).getHours();
         return feedHour === latestHour || feedHour === prevHour;
       }) 
@@ -63,7 +64,15 @@ async function updateAndPredict(){
       const predictedValue = await regressionModel.predictAirPollution(readyPredict);
       //menyimpan data baru kedalam dataset
       if(predictedValue){
-        
+        // predictedValue[co, pm25]
+        await resultPrediction.create({
+          jenis:"CO",
+          value: parseFloat(predictedValue[0])
+        });
+        await resultPrediction.create({
+          jenis:"PM25",
+          value: parseFloat(predictedValue[1])
+        });
         const newDataPoint = new dataset({
           value: {
             co: parseFloat(readyPredict[2]),

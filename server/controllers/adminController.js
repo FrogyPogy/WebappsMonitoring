@@ -5,6 +5,7 @@ const resultModel = require('../models/resultModel');
 const path = require('path');
 const datatest = require('../models/datatest');
 const fs = require('fs');
+const regressionModel = require("../models/regressionModel");
 
 exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
     try{
@@ -47,12 +48,18 @@ exports.uploadDatatest = async(req, res) => {//Masih ada perbaikan fungsi jangan
         const data = await fs.promises.readFile(filePath, 'utf8');
         const jsonData = JSON.parse(data);
 
-        await datatest.deleteMany({});
+        const datatestCount = await datatest.countDocuments({});
+
+        if (datatestCount > 0){
+            //hapus dataset dan datatrain lama
+            await datatest.deleteMany({});
+        }
+        
         // Urutkan data JSON berdasarkan created_at
         jsonData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
         for (const item of jsonData){
-            const newDatatest = new datatrain({
+            const newDatatest = new datatest({
                 value: {
                     co: parseFloat(item.co).toFixed(2),
                     pm25: parseFloat(item.pm25).toFixed(2),
@@ -252,7 +259,8 @@ const getModel = async() => {
         const formatResult = result.map(item => ({
             name: item.name,
             lastTrainedAt: item.lastTrainedAt,
-            performance: item.performance !== undefined ? item.performance: "belum dievaluasi"
+            performance: item.performance !== undefined ? item.performance: "belum dievaluasi",
+            _id: item._id
         }));
         return formatResult; 
     }catch(error){
@@ -264,29 +272,56 @@ const getModel = async() => {
 exports.runEvaluation = async (req, res) => {
     try{
       const recentData = await datatest.find({});
-      //const latestData = await regressionModel.isLatestData(recentData[recentData.length-1]);
+      const { modelId, modelName } = req.body;
+      console.log('Received modelId:', modelId, modelName);
+      
       
       //const predictedValue; untuk menampung hasil prediksi seluruh data
+      const predictedValues = [];
+
       for (const item of recentData) {
         var co = parseFloat(item.value.co);
         var pm25 = parseFloat(item.value.pm25);
         var temperature = parseFloat(item.value.temperature);
         var humidity = parseFloat(item.value.humidity);
         var windSpeed = parseFloat(item.value.windSpeed);
-        var hours = new Date(item.hours);
+        var hours = item.hours;
         var nextHour = (hours + 1) % 24;
         var data = [nextHour, co, pm25, temperature, humidity, windSpeed];
-        const predicted = await regressionModel.predictTest(readyPredict);
+        console.log(data);
+        const predicted = await regressionModel.predictTest(data, modelId);
+        console.log('hasil prediksi co: ',predicted);
         if(predicted){
-            //await push to predictedValue
+            //await push to predictedValue          
+            const predictedData = {
+                timestamp: item.timestamp,
+                hours: item.hours,
+                predicted:parseFloat(predicted)
+            };
+            predictedValues.push(predictedData);
         }
-      }  
-      //predictedValue
+      }
+      if(predictedValues.length > 0){
+        //run MAPE function
+        const actualData = recentData.map(item => ({
+            timestamp: item.timestamp,
+            actualco : parseFloat(item.actual.actualco),
+            actualpm25: parseFloat(item.actual.actualpm25)
+        }));
+        const resultMAPE = regressionModel.calculateMAPE(actualData, predictedValues, modelName);
+        await resultModel.findByIdAndUpdate(
+            modelId,
+            { performance: resultMAPE },
+            { new: true } // Mengembalikan dokumen yang telah diperbarui
+        );
+        res.json({ success: true, predictions: predictedValues });
+      }
+      
     }catch(error){
       console.error('Terjadi kesalahan saat pengambilan datatest');
       throw error;
     }
-  }
+};
 
 exports.backupData = async (req, res) => {
     try{

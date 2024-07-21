@@ -33,7 +33,11 @@
               <td><%= model.name %></td>
               <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
               <td><%= model.performance %></td>
-              <td><a class="rounded-4 btn btn-primary btn-sm signBtn" href="#"><span><i class="bi bi-graph-up"></i></span> evaluate</a></td>
+              
+              <td><button class="rounded-4 btn btn-primary btn-sm signBtn evaluate-btn" data-id="<%= model._id %>" data-name="<%= model.name %>">
+                <span><i class="bi bi-graph-up"></i></span> Evaluate
+              </button></td>
+              <!-- <td><a class="rounded-4 btn btn-primary btn-sm signBtn" href="#"><span><i class="bi bi-graph-up"></i></span> evaluate</a></td> -->
             </tr>
             <% }) %>
           </tbody>
@@ -60,3 +64,36 @@
 <script src="plugins/feather.min.js"></script>
 <!-- Custom scripts -->
 <script src="/js/script.js"></script>
+
+<script>
+
+document.querySelectorAll('.evaluate-btn').forEach(button => {
+      button.addEventListener('click', async function(event) {
+        event.preventDefault();
+        const modelName = this.getAttribute('data-name');
+        const modelId = this.getAttribute('data-id');
+
+        try {
+          const response = await fetch('/runEvaluation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ modelId, modelName })
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            alert('Evaluation completed successfully');
+            console.log(result.predictions); // Atau tampilkan hasil di halaman
+          } else {
+            alert(result.error);
+          }
+        } catch (error) {
+          console.error('Error during evaluation:', error);
+          alert('An error occurred during evaluation');
+        }
+      });
+    });
+</script>
+

@@ -83,7 +83,7 @@ exports.initializeModel = async (req, res) => {
       await resultModel.deleteMany({});
     }
     
-    //ambil seluruh data dari datatrain
+    //ambil seluruh data dari dataset
     const firstDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
     await regressionModel.firstTrainPM25(firstDataset);
     await regressionModel.firstTrain(firstDataset);

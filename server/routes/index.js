@@ -34,6 +34,8 @@ router.get('/prediction', requireAuth, adminController.displayPrediction);
 router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 //Route menampilkan evaluation performance model
 router.get('/evaluation', requireAuth, adminController.getEvaluation);
+router.post('/runEvaluation', requireAuth, adminController.runEvaluation);
+
 //Route membackup dataset yang telah disimpan
 router.get('/backup', requireAuth, adminController.backupData);
 //Route upload Dataset, datatest dan data train
