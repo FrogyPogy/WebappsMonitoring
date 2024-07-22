@@ -8,7 +8,7 @@ const resultPrediction = require('../models/resultPrediction');
 module.exports = {
     start: () => {
         //melakukan scheduling setiap 5 menit utk ambil dan prediksi data
-        cron.schedule('12 * * * *', updateAndPredict);
+        cron.schedule('*/2 * * * *', updateAndPredict);
         //melakukan scheduling setiap 3 hari sekali untuk updateModel Regresi 
         // cron.schedule('0 0 */3 * *', regressionModel.updateRegressionModel);
     },
@@ -54,29 +54,22 @@ async function updateAndPredict(){
       const fieldHum = filterData.map(feed => parseFloat(feed.field4)).filter(value => !isNaN(value));
       const fieldWS = filterData.map(feed => parseFloat(feed.field5)).filter(value => !isNaN(value));
       const nextHour = (latestHour+1) % 24;
-      const data = [nextHour, fieldCO, fieldPM25, fieldTemp, fieldHum, fieldWS];
+      const data = [latestHour, fieldCO, fieldPM25, fieldTemp, fieldHum, fieldWS];
       
       const time = new Date(latestFeed.created_at);
       // data yang siap untuk diprediksi
 
       const readyPredict = calcMedian(data);
-      console.log(readyPredict);
+      console.log(readyPredict[1]);
       const predictedValue = await regressionModel.predictAirPollution(readyPredict);
       //menyimpan data baru kedalam dataset
       if(predictedValue){
         // predictedValue[co, pm25]
-        await resultPrediction.create({
-          jenis:"CO",
-          value: parseFloat(predictedValue[0])
-        });
-        await resultPrediction.create({
-          jenis:"PM25",
-          value: parseFloat(predictedValue[1])
-        });
+        
         const newDataPoint = new dataset({
           value: {
-            co: parseFloat(readyPredict[2]),
-            pm25: parseFloat(readyPredict[1]),
+            co: parseFloat(readyPredict[1]),
+            pm25: parseFloat(readyPredict[2]),
             temperature: parseFloat(readyPredict[3]),
             humidity: parseFloat(readyPredict[4]),
             windSpeed: parseFloat(readyPredict[5])

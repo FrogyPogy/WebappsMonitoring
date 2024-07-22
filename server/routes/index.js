@@ -35,9 +35,13 @@ router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 //Route menampilkan evaluation performance model
 router.get('/evaluation', requireAuth, adminController.getEvaluation);
 router.post('/runEvaluation', requireAuth, adminController.runEvaluation);
+router.delete('/deleteModel', requireAuth, adminController.deleteModel);
 
 //Route membackup dataset yang telah disimpan
 router.get('/backup', requireAuth, adminController.backupData);
+router.get('/backup/json', requireAuth, adminController.downloadJson);
+router.get('/backup/csv', requireAuth, adminController.downloadCsv);
+
 //Route upload Dataset, datatest dan data train
 router.get('/uploadData', requireAuth, adminController.uploadData);
 router.post('/uploadData', requireAuth, upload.single('dataset'), adminController.uploadDataset);

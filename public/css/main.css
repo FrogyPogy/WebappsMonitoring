@@ -127,6 +127,13 @@ url image sebagai berikut:
     margin-bottom: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+.download-icons{
+    background-image: url(../img/svg/Bulk/Download.svg);
+    width: 24px;
+    height: 24px;
+    margin: auto;
+    background-repeat: no-repeat;
+}
 
 .icon-container {
     width: 100px;

@@ -6,6 +6,7 @@ const path = require('path');
 const datatest = require('../models/datatest');
 const fs = require('fs');
 const regressionModel = require("../models/regressionModel");
+const json2csv = require('json2csv').parse;
 
 exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
     try{
@@ -16,7 +17,9 @@ exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek 
             description:'Air Pollution Monitoring and Prediction System',
             layout: './layouts/admin',
             totalData: totalData[0],
-            totalPredicted: totalData[1]
+            totalPredicted: totalData[1],
+            peformaCO: totalData[2],
+            peformaPM25: totalData[3]
         };
         res.render('admin/dashboard', locals); //rendering admin dashboarad in views
     }catch (error){
@@ -236,7 +239,6 @@ exports.displayPrediction = async (req, res) => {
     }
 };
 
-
 exports.getEvaluation = async (req, res) => {
     try{
         const models = await getModel();
@@ -273,8 +275,6 @@ exports.runEvaluation = async (req, res) => {
     try{
       const recentData = await datatest.find({});
       const { modelId, modelName } = req.body;
-      console.log('Received modelId:', modelId, modelName);
-      
       
       //const predictedValue; untuk menampung hasil prediksi seluruh data
       const predictedValues = [];
@@ -287,7 +287,7 @@ exports.runEvaluation = async (req, res) => {
         var windSpeed = parseFloat(item.value.windSpeed);
         var hours = item.hours;
         var nextHour = (hours + 1) % 24;
-        var data = [nextHour, co, pm25, temperature, humidity, windSpeed];
+        var data = [hours, co, pm25, temperature, humidity, windSpeed];
         console.log(data);
         const predicted = await regressionModel.predictTest(data, modelId);
         console.log('hasil prediksi co: ',predicted);
@@ -311,7 +311,7 @@ exports.runEvaluation = async (req, res) => {
         const resultMAPE = regressionModel.calculateMAPE(actualData, predictedValues, modelName);
         await resultModel.findByIdAndUpdate(
             modelId,
-            { performance: resultMAPE },
+            { performance: parseFloat(resultMAPE).toFixed(2) },
             { new: true } // Mengembalikan dokumen yang telah diperbarui
         );
         res.json({ success: true, predictions: predictedValues });
@@ -336,12 +336,79 @@ exports.backupData = async (req, res) => {
         res.status(500).render('error',{message:'Terjadi kesalahan saat memuat halaman backup dataset'});
     }
 };
+
+exports.downloadJson = async (req, res) => {
+    try {
+        const datasets = await dataset.find({});
+        const predictions = await resultPrediction.find({});
+
+        const data = {
+            datasets,
+            predictions
+        };
+
+        res.setHeader('Content-Disposition', 'attachment; filename=backup.json');
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(data, null, 2));
+    } catch (error) {
+        console.error('Terjadi kesalahan saat mengunduh data JSON:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh data JSON');
+    }
+};
+
+exports.downloadCsv = async (req, res) => {
+    try {
+        const datasets = await dataset.find({});
+        const predictions = await resultPrediction.find({});
+
+        const datasetCsv = json2csv(datasets, { fields: ['_id', 'value.co', 'value.pm25', 'value.temperature', 'value.humidity', 'value.windSpeed', 'timestamp', 'hours'] });
+        const predictionCsv = json2csv(predictions, { fields: ['createdAt', 'value', 'jenis'] });
+
+        const csv = `Datasets\n${datasetCsv}\n\nPredictions\n${predictionCsv}`;
+
+        res.setHeader('Content-Disposition', 'attachment; filename=backup.csv');
+        res.setHeader('Content-Type', 'text/csv');
+        res.send(csv);
+    } catch (error) {
+        console.error('Terjadi kesalahan saat mengunduh data CSV:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh data CSV');
+    }
+};
+
+exports.deleteModel = async (req, res) => {
+    try{
+        const { modelId } = req.body;
+        console.log('Received modelId:', modelId); // Log to check if modelId is received
+
+        const result = await resultModel.findByIdAndDelete(modelId);
+
+        if (!result) {
+            return res.status(404).json({ message: 'Result not found' });
+        }
+        res.status(200).json({ success: true, message: 'Model deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting model:', error);
+        res.status(500).json({ message: 'Error deleting model' });
+    }
+};
+exports.testFunction = async (req, res) => {
+    try{
+        const {modelId} = req.body;
+        console.log(modelId);
+    }catch(error){
+
+    }
+}
+
 //Get total data saved in dataset 
 const getDataset = async () => {
     try{
         const totalData = await dataset.countDocuments({});
         const totalPredicted = await resultPrediction.countDocuments({});
-        var total = [totalData, totalPredicted];
+        const performanceCO = await resultModel.findOne({ name: 'modelCO' }).sort({ lastTrainedAt: -1 }).limit(1);
+        const performancePM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({lastTrainedAt: -1}).limit(1);
+
+        var total = [totalData, totalPredicted, performanceCO.performance, performancePM25.performance];
         return total;
     }catch(error){
         console.error('Kesalahan dalam menghitung data:', error);

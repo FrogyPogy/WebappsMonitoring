@@ -4,7 +4,7 @@ const resultModel = require('../models/resultModel');
 const resultPrediction = require('./resultPrediction');
 
 module.exports = {
-    predictAirPollution: async (data, _id = 1) => { //digunakan hanya untuk prediksi
+    predictAirPollution: async (data) => { //digunakan hanya untuk prediksi
         try {
           
           /*format input Data yang digunakan yaitu:
@@ -13,7 +13,7 @@ module.exports = {
               array 1D misal [16, 3, 5, 50, 30, 2]
           */
           // Coba memuat model regresi dari database resultModel
-          
+          console.log('posisi di fungsi predictAirPollution dengan data, ', data);
           const fetchModelCO = await resultModel.findOne({ name: 'modelCO' }).sort({ lastTrainedAt: -1 }).limit(1);
           const fetchModelPM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({ lastTrainedAt: -1 }).limit(1);
           
@@ -28,8 +28,16 @@ module.exports = {
             const predictionCO = math.abs(math.multiply(data, coeffCO));
             const predictionPM25 = math.abs(math.multiply(dataPM25, coeffPM25));
             // Simpan hasil prediksi yang baru
-            const result = [predictionCO, predictionPM25];
-            return result;
+            await resultPrediction.create({
+              jenis:"CO",
+              value: parseFloat(predictionCO)
+            });
+            await resultPrediction.create({
+              jenis:"PM25",
+              value: parseFloat(predictionPM25)
+            });
+            
+            return true;
           }
           else{
             // Jika model belum ada, kembalikan null
@@ -48,9 +56,11 @@ module.exports = {
         for (const actual of actualData){
           const predicted = predictedData.find(p => p.timestamp.toISOString() === actual.timestamp.toISOString());
           
+
           if (predicted && type == 'modelCO'){
             const actualValue = parseFloat(actual.actualco);
             const predictedValue = parseFloat(predicted.predicted);
+            console.log('predicted value = ', predicted, 'actual value = ', actualValue);
 
             if (actualValue !== 0){
               const ape = math.abs((actualValue - predictedValue) / actualValue);
@@ -82,7 +92,6 @@ module.exports = {
         // Coba memuat model regresi dari database resultModel
         
         const fetchModel = await resultModel.findOne({ _id: _id });
-        
         const coeff = fetchModel.model.flat();
         const modelName = fetchModel.name;
         var dataPM25 = data;
@@ -91,12 +100,14 @@ module.exports = {
         [dataPM25[1], dataPM25[2]] = [dataPM25[2], dataPM25[1]];
         
         if (fetchModel && (modelName == 'modelCO' )) {
+          console.log('model yang dievaluasi saat ini', modelName);
           const predictionCO = math.abs(math.multiply(data, coeff));
           
           const result = predictionCO;
           // Simpan hasil prediksi yang baru
           return result;
         }else if (fetchModel && (modelName == 'modelPM25')){
+          console.log('model yang digunakan saat ini', modelName);
           const predictionPM25 = math.abs(math.multiply(dataPM25, coeff));
           const result = predictionPM25;
           return result;

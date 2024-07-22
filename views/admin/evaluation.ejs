@@ -23,7 +23,8 @@
               <th>Jenis Model</th>
               <th>Last Trained</th>
               <th>Performance</th>
-              <th>Action</th>
+              <th>Evaluation</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -33,11 +34,13 @@
               <td><%= model.name %></td>
               <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
               <td><%= model.performance %></td>
-              
               <td><button class="rounded-4 btn btn-primary btn-sm signBtn evaluate-btn" data-id="<%= model._id %>" data-name="<%= model.name %>">
                 <span><i class="bi bi-graph-up"></i></span> Evaluate
               </button></td>
-              <!-- <td><a class="rounded-4 btn btn-primary btn-sm signBtn" href="#"><span><i class="bi bi-graph-up"></i></span> evaluate</a></td> -->
+
+              <td><button class="rounded-4 btn btn-danger btn-sm delete-btn" data-id="<%= model._id %>">
+                <span><i class="bi bi-trash3-fill"></i></span> Delete
+              </button></td>
             </tr>
             <% }) %>
           </tbody>
@@ -67,7 +70,7 @@
 
 <script>
 
-document.querySelectorAll('.evaluate-btn').forEach(button => {
+  document.querySelectorAll('.evaluate-btn').forEach(button => {
       button.addEventListener('click', async function(event) {
         event.preventDefault();
         const modelName = this.getAttribute('data-name');
@@ -95,5 +98,36 @@ document.querySelectorAll('.evaluate-btn').forEach(button => {
         }
       });
     });
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', async function(event) {
+      event.preventDefault();
+      const modelId = this.getAttribute('data-id');
+
+      try{
+        const response = await fetch('/deleteModel', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ modelId }) 
+        });
+         // Debug: Log the raw response before parsing as JSON
+        const text = await response.text();
+        console.log('Raw response:', text);
+
+        const result = JSON.parse(text);
+          if (response.ok) {
+            alert('Delete model successfully');
+            location.reload();
+          } else {
+            alert(result.error);
+          }
+
+      }catch(error){
+        console.error('Error during delete model:', error);
+        alert('An error occurred during delete model');
+      }
+    })
+  });
 </script>
 
