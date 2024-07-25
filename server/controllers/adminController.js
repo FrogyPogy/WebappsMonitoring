@@ -7,10 +7,14 @@ const datatest = require('../models/datatest');
 const fs = require('fs');
 const regressionModel = require("../models/regressionModel");
 const json2csv = require('json2csv').parse;
+const users = require('../models/user');
 
 exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek exports
     try{
         // Memanggil fungsi untuk mendapatkan jumlah dokumen
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
+
         const totalData = await getDataset();
         const locals = {
             title: 'AIRMIND - Admin',
@@ -19,7 +23,8 @@ exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek 
             totalData: totalData[0],
             totalPredicted: totalData[1],
             peformaCO: totalData[2],
-            peformaPM25: totalData[3]
+            peformaPM25: totalData[3],
+            userName: fetchUsers.username // Mengirim nama pengguna ke view
         };
         res.render('admin/dashboard', locals); //rendering admin dashboarad in views
     }catch (error){
@@ -30,10 +35,14 @@ exports.dashboard = async(req, res) => {  //Menerapkan langsung fungsi ke objek 
 
 exports.uploadData = async(req, res) => {
     try{
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
+
         const locals = {
             title: 'AIRMIND - Upload',
             description: 'Air Pollution Monitoring and Prediction System',
-            layout: './layouts/admin'
+            layout: './layouts/admin',
+            userName: fetchUsers.username
         }
         res.render('admin/uploadData', locals);
     }catch(error){
@@ -41,7 +50,8 @@ exports.uploadData = async(req, res) => {
         res.status(500).render('error',{message:'Tidak dapat memuat halaman Upload'});
     }
 };
-exports.uploadDatatest = async(req, res) => {//Masih ada perbaikan fungsi jangan dipakai dahulu
+//Mengupload datatest yang digunakan untuk evaluasi model
+exports.uploadDatatest = async(req, res) => {
     if (!req.file){
         return res.status(400).send('No file uploaded');
     }
@@ -89,7 +99,7 @@ exports.uploadDatatest = async(req, res) => {//Masih ada perbaikan fungsi jangan
         res.status(400).send('Invalid JSON format');
     }
 };
-
+// Upload data untuk Inisialisasi dataset awal
 exports.uploadDataset = async(req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded');
@@ -137,10 +147,16 @@ exports.uploadDataset = async(req, res) => {
             res.status(400).send('Invalid JSON format');
         };
 };
-
+//Menampilkan halaman berisi seluruh dataset
 exports.getDataSaved = async (req, res) => {
     try{
-        const datasets = await fetchDataset(); // Panggil fungsi fetchDataset untuk mendapatkan data
+        const page = parseInt(req.query.page) || 1;
+        const limit = 15;
+        const startIndex = (page - 1) * limit;
+
+        const totalDatasets = await dataset.countDocuments();
+        const datasets = await dataset.find().skip(startIndex).limit(limit);
+
         const viewdataset = datasets.map(item => ({
             co: item.value.co,
             pm25: item.value.pm25,
@@ -148,13 +164,22 @@ exports.getDataSaved = async (req, res) => {
             hum:item.value.humidity,
             windSpeed:item.value.windSpeed,
             timestamp:item.timestamp,
+            _id: item._id
         }));
+
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
         const locals = {
-            title: 'AIRMIND - Data Pollution Saved',
-            description:'Air Pollution Monitoring and Prediction System',
-            layout: './layouts/admin'
+            title: 'AIRMIND - Air Pollution Dataset',
+            description: 'Air Pollution Monitoring and Prediction System',
+            layout: './layouts/admin',
+            current: page,
+            pages: Math.ceil(totalDatasets / limit),
+            viewdataset: viewdataset,
+            userName: fetchUsers.username
         };
-        res.render('admin/viewDataSaved', {...locals, viewdataset});
+
+        res.render('admin/viewDataSaved', locals);
     }catch (error){
         console.error('terjadi kesalahan saat memuat halaman Dataset:', error);
         res.status(500).render('error',{message:'Terjadi kesalahan saat memuat halaman dataset'});
@@ -172,14 +197,21 @@ const fetchDataset = async () => {
 };
 
 //DisplayAirPollutinPrediction
+/*Tampilkan hasil prediksi beserta aktual value dimana
+waktu dari aktual value merupakan satu jam kedepan setelah
+waktu hasil prediksi tersebut (waktu aktual value = waktu prediksi + 1jam)
+*/
 exports.displayPrediction = async (req, res) => {
     try {
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
+
         const locals = {
             title: 'Prediction - AIRMIND',
             description: 'Air Pollution Monitoring and Prediction System',
-            layout: './layouts/admin'
+            layout: './layouts/admin',
+            userName: fetchUsers.username
         };
-
         const predictions = await resultPrediction.find({});
         const datasets = await fetchDataset(); // Panggil fungsi fetchDataset untuk mendapatkan data
 
@@ -187,41 +219,29 @@ exports.displayPrediction = async (req, res) => {
         /*reduce digunakan untuk menerapkan fungsi yang dibuat didalamnya pada setiap elemen array
         reduce(callback, initialValue) dan disini initialValue diisi kosong {}
         */
-        const combinedPredictions = predictions.reduce((acc, prediction) => {
-            const timestamp = prediction.createdAt;
-            const key = timestamp.toISOString().slice(0, 16); // Ambil YYYY-MM-DDTHH:MM
-            if (!acc[key]) {//inisialisasi object acc[]
-                acc[key] = { timestamp, predictedCO: null, predictedPM25: null };
-            }
-            if (prediction.jenis === 'CO') {//mengisi nilai object acc[] pada field co
-                acc[key].predictedCO = prediction.value;
-            } else if (prediction.jenis === 'PM25') {// mengisi nilai object pada field pm25
-                acc[key].predictedPM25 = prediction.value;
-            }
-            return acc;//return acc atau akumulator untuk iterasi elemen berikutnya 
-        }, {});
 
         // Konversi objek menjadi array
-        const combinedPredictionsArray = Object.values(combinedPredictions);
+        const combinedPredictionsArray = Object.values(predictions);
 
         // Fungsi untuk membandingkan hanya tanggal dan jam (mengabaikan menit dan detik)
-        const compareDateHour = (date1, date2) => {
-            const d1 = new Date(date1);
-            const d2 = new Date(date2);
+        const compareDateHour = (datePredict, dateActual) => {
+            const d1 = new Date(datePredict);
+            const d2 = new Date(dateActual);
             return d1.getFullYear() === d2.getFullYear() &&
                    d1.getMonth() === d2.getMonth() &&
                    d1.getDate() === d2.getDate() &&
-                   d1.getHours() === d2.getHours();
+                   d1.getHours() === d2.getHours(); //karena hasil prediksi merupakan data untuk satu jam kedepan
         };
 
         // Gabungkan data prediksi dan data aktual berdasarkan tanggal dan jam
         const combinedData = combinedPredictionsArray.reduce((acc, prediction) => {
-            const actual = datasets.find(dataset => compareDateHour(prediction.timestamp, dataset.timestamp)) || {};
+            const actual = datasets.find(dataset => compareDateHour(prediction.createdAt, dataset.timestamp)) || {};
             if (actual){
                 acc.push({
-                    timestamp: prediction.timestamp,
-                    predictedCO: prediction.predictedCO,
-                    predictedPM25: prediction.predictedPM25,
+                    _id: prediction._id,
+                    timestamp: prediction.createdAt,
+                    predictedCO: prediction.value.co,
+                    predictedPM25: prediction.value.pm25,
                     actualCO: actual.value ? actual.value.co : null,
                     actualPM25: actual.value ? actual.value.pm25 : null
                 })
@@ -229,9 +249,20 @@ exports.displayPrediction = async (req, res) => {
             return acc;
         }, []);
 
+        // Pagination logic
+        const page = parseInt(req.query.page) || 1;
+        const limit = 15;
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const paginatedResults = combinedData.slice(startIndex, endIndex);
+
+        const totalPages = Math.ceil(combinedData.length / limit);
+
         res.render('admin/prediction', {
             ...locals,
-            combinedData
+            combinedData: paginatedResults,
+            currentPage: page,
+            totalPages: totalPages
         });
     } catch (error) {
         console.error('Terjadi kesalahan saat memuat halaman prediksi:', error);
@@ -242,11 +273,14 @@ exports.displayPrediction = async (req, res) => {
 exports.getEvaluation = async (req, res) => {
     try{
         const models = await getModel();
-        
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
+
         const locals = {
             title: 'AIRMIND - Model Evaluation',
             description:'Air Pollution Monitoring and Prediction System',
-            layout: './layouts/admin'
+            layout: './layouts/admin',
+            userName: fetchUsers.username
         };
         res.render('admin/evaluation', {...locals, models});
     }catch(error){
@@ -308,7 +342,7 @@ exports.runEvaluation = async (req, res) => {
             actualco : parseFloat(item.actual.actualco),
             actualpm25: parseFloat(item.actual.actualpm25)
         }));
-        const resultMAPE = regressionModel.calculateMAPE(actualData, predictedValues, modelName);
+        const resultMAPE = regressionModel.calculateRMSE(actualData, predictedValues, modelName);
         await resultModel.findByIdAndUpdate(
             modelId,
             { performance: parseFloat(resultMAPE).toFixed(2) },
@@ -325,10 +359,14 @@ exports.runEvaluation = async (req, res) => {
 
 exports.backupData = async (req, res) => {
     try{
+        const userId = req.user.id; //ambil user_id yang dikirimkan oleh middleware authentikasi
+        const fetchUsers = await users.findById(userId).lean(); // Mengambil informasi user
+
         const locals = {
             title: 'AIRMIND - Backup Dataset',
             description:'Air Pollution Monitoring and Prediction System',
-            layout: './layouts/admin'
+            layout: './layouts/admin',
+            userName: fetchUsers.username
         };
         res.render('admin/backupdata', locals);
     }catch(error){
@@ -337,41 +375,76 @@ exports.backupData = async (req, res) => {
     }
 };
 
-exports.downloadJson = async (req, res) => {
+exports.downloadDatasetJson = async (req, res) => {
     try {
         const datasets = await dataset.find({});
-        const predictions = await resultPrediction.find({});
 
-        const data = {
-            datasets,
-            predictions
-        };
-
-        res.setHeader('Content-Disposition', 'attachment; filename=backup.json');
+        res.setHeader('Content-Disposition', 'attachment; filename=backupDataset.json');
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(data, null, 2));
+        res.send(JSON.stringify(datasets, null, 2));
     } catch (error) {
-        console.error('Terjadi kesalahan saat mengunduh data JSON:', error);
-        res.status(500).send('Terjadi kesalahan saat mengunduh data JSON');
+        console.error('Terjadi kesalahan saat mengunduh dataset JSON:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh dataset JSON');
     }
 };
 
-exports.downloadCsv = async (req, res) => {
+exports.downloadPredictionJson = async (req, res) => {
+    try{
+        const predictions = await resultPrediction.find({});
+        res.setHeader('Content-Disposition', 'attachment; filename=backupPrediction.json');
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(predictions, null, 2));
+
+    }catch(error){
+        console.error('Terjadi kesalahan saat mengunduh data prediction JSON:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh data prediction JSON');
+    }
+};
+
+exports.downloadDatasetCsv = async (req, res) => {
     try {
         const datasets = await dataset.find({});
-        const predictions = await resultPrediction.find({});
-
         const datasetCsv = json2csv(datasets, { fields: ['_id', 'value.co', 'value.pm25', 'value.temperature', 'value.humidity', 'value.windSpeed', 'timestamp', 'hours'] });
-        const predictionCsv = json2csv(predictions, { fields: ['createdAt', 'value', 'jenis'] });
 
-        const csv = `Datasets\n${datasetCsv}\n\nPredictions\n${predictionCsv}`;
+        const csv = `Datasets\n${datasetCsv}`;
 
-        res.setHeader('Content-Disposition', 'attachment; filename=backup.csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=backupDataset.csv');
         res.setHeader('Content-Type', 'text/csv');
         res.send(csv);
     } catch (error) {
-        console.error('Terjadi kesalahan saat mengunduh data CSV:', error);
-        res.status(500).send('Terjadi kesalahan saat mengunduh data CSV');
+        console.error('Terjadi kesalahan saat mengunduh dataset CSV:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh dataset CSV');
+    }
+};
+exports.downloadPredictionCsv = async (req, res) => {
+    try {
+        const predictions = await resultPrediction.find({});
+        const predictionCsv = json2csv(predictions, { fields: ['createdAt', 'value.co', 'value.pm25'] });
+
+        const csv = `Predictions\n${predictionCsv}`;
+
+        res.setHeader('Content-Disposition', 'attachment; filename=backupPrediction.csv');
+        res.setHeader('Content-Type', 'text/csv');
+        res.send(csv);
+    } catch (error) {
+        console.error('Terjadi kesalahan saat mengunduh data prediction CSV:', error);
+        res.status(500).send('Terjadi kesalahan saat mengunduh data prediction CSV');
+    }
+};
+
+exports.deleteDataset = async (req, res) => {
+    try{
+        const { datasetId } = req.body;
+        const result = await dataset.findByIdAndDelete( datasetId );
+
+        if(!result){
+            return res.status(404).json({ message: 'Dataset not found' });
+        }
+        res.status(200).json({ success: true, message: 'Dataset deleted successfully' });
+
+    }catch(error){
+        console.error('Error deleting model:', error);
+        res.status(500).json({ message: 'Error deleting dataset' });
     }
 };
 
@@ -391,14 +464,20 @@ exports.deleteModel = async (req, res) => {
         res.status(500).json({ message: 'Error deleting model' });
     }
 };
-exports.testFunction = async (req, res) => {
+exports.deletePrediction = async (req, res) => {
     try{
-        const {modelId} = req.body;
-        console.log(modelId);
-    }catch(error){
+        const { predictionId } = req.body;
+        const result = await resultPrediction.findByIdAndDelete(predictionId);
 
+        if(!result){
+            return res.status(404).json({message: 'Result not found'});
+        }
+        res.status(200).json({success: true, message: 'Prediction data deleted successfully'});
+    }catch(error){
+        console.error('Error deleting prediction data: ', error);
+        res.status(500).json({message: 'Error deleting prediction data'});
     }
-}
+};
 
 //Get total data saved in dataset 
 const getDataset = async () => {
@@ -413,4 +492,4 @@ const getDataset = async () => {
     }catch(error){
         console.error('Kesalahan dalam menghitung data:', error);
     }
-}
+};

@@ -28,16 +28,9 @@ module.exports = {
             const predictionCO = math.abs(math.multiply(data, coeffCO));
             const predictionPM25 = math.abs(math.multiply(dataPM25, coeffPM25));
             // Simpan hasil prediksi yang baru
-            await resultPrediction.create({
-              jenis:"CO",
-              value: parseFloat(predictionCO)
-            });
-            await resultPrediction.create({
-              jenis:"PM25",
-              value: parseFloat(predictionPM25)
-            });
             
-            return true;
+            const result = [predictionCO, predictionPM25];
+            return result;
           }
           else{
             // Jika model belum ada, kembalikan null
@@ -84,6 +77,37 @@ module.exports = {
         throw error;
       }
     }, 
+
+    calculateRMSE: (actualData, predictedData, type) => {
+      try {
+        let totalSquaredError = 0;
+        let count = 0;
+  
+        for (const actual of actualData) {
+          const predicted = predictedData.find(p => p.timestamp.toISOString() === actual.timestamp.toISOString());
+          
+          if (predicted && type === 'modelCO') {
+            const actualValue = parseFloat(actual.actualco);
+            const predictedValue = parseFloat(predicted.predicted);
+  
+            const squaredError = Math.pow(actualValue - predictedValue, 2);
+            totalSquaredError += squaredError;
+            count++;
+          } else if (predicted && type === 'modelPM25') {
+            const actualValue = parseFloat(actual.actualpm25);
+            const predictedValue = parseFloat(predicted.predicted);
+  
+            const squaredError = Math.pow(actualValue - predictedValue, 2);
+            totalSquaredError += squaredError;
+            count++;
+          }
+        }
+        return Math.sqrt(totalSquaredError / count);
+      } catch (error) {
+        console.error('Terjadi kesalahan saat menghitung RMSE:', error);
+        throw error;
+      }
+    },
 
     predictTest: async (data, _id) => {
       try {

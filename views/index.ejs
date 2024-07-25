@@ -136,8 +136,9 @@
                 const response = await fetch(`/getPrediction`);
                 const dataPredict = await response.json();
 
-                const coPrediction = parseFloat(dataPredict[0].value).toFixed(2);
-                const pm25Prediction = parseFloat(dataPredict[1].value).toFixed(2);
+                const coPrediction = parseFloat(dataPredict.value.co).toFixed(2);
+                const pm25Prediction = parseFloat(dataPredict.value.pm25).toFixed(2);
+
 
                 document.getElementById('predictionCO').innerText = coPrediction;
                 document.getElementById('predictionPM25').innerText = pm25Prediction;

@@ -10,6 +10,7 @@ const upload = multer({ dest: 'uploads/' });
 /** Routes app*/
 router.get('/',mainController.homepage);
 router.get('/about',mainController.about);
+router.get('/contact', mainController.contact);
 //router intializeDataset
 router.get('/initialize',mainController.initializeData);
 //Route menampilkan hasil prediksi terbaru
@@ -18,6 +19,7 @@ router.get('/getPrediction', mainController.getPrediction);
 router.get('/data', mainController.getData);
 //Route initialisasi model pertama regresi pm25 dan co
 router.get('/initializeModel',requireAuth,mainController.initializeModel);
+router.get('/updateModel', requireAuth, mainController.updateModel);
 //Route signIn
 router.get('/signIn',loginController.signInPage);
 router.post('/signIn',loginController.checkAuth);
@@ -28,8 +30,12 @@ router.get('/signUp',loginController.signUpPage);
 router.get('/signOut',loginController.signOut);
 //Route admin
 router.get('/admin', requireAuth, adminController.dashboard);
+router.delete('/deleteDataset', requireAuth, adminController.deleteDataset);
+
 //Route menampilkan seluruh hasil prediksi
 router.get('/prediction', requireAuth, adminController.displayPrediction);
+router.delete('/deletePrediction', requireAuth, adminController.deletePrediction);
+
 //Route menampilkan semua data pollution yang disimpan dalam satuan jam
 router.get('/getDataSaved', requireAuth, adminController.getDataSaved);
 //Route menampilkan evaluation performance model
@@ -39,8 +45,10 @@ router.delete('/deleteModel', requireAuth, adminController.deleteModel);
 
 //Route membackup dataset yang telah disimpan
 router.get('/backup', requireAuth, adminController.backupData);
-router.get('/backup/json', requireAuth, adminController.downloadJson);
-router.get('/backup/csv', requireAuth, adminController.downloadCsv);
+router.get('/backup/Datasetjson', requireAuth, adminController.downloadDatasetJson);
+router.get('/backup/Predictionjson', requireAuth, adminController.downloadPredictionJson);
+router.get('/backup/Datasetcsv', requireAuth, adminController.downloadDatasetCsv);
+router.get('/backup/Predictioncsv', requireAuth, adminController.downloadPredictionCsv);
 
 //Route upload Dataset, datatest dan data train
 router.get('/uploadData', requireAuth, adminController.uploadData);

@@ -7,8 +7,8 @@ const resultPrediction = require('../models/resultPrediction');
 
 module.exports = {
     start: () => {
-        //melakukan scheduling setiap 5 menit utk ambil dan prediksi data
-        cron.schedule('*/2 * * * *', updateAndPredict);
+        //melakukan scheduling setiap satu jam utk ambil dan prediksi data
+        cron.schedule('12 * * * *', updateAndPredict);
         //melakukan scheduling setiap 3 hari sekali untuk updateModel Regresi 
         // cron.schedule('0 0 */3 * *', regressionModel.updateRegressionModel);
     },
@@ -65,7 +65,14 @@ async function updateAndPredict(){
       //menyimpan data baru kedalam dataset
       if(predictedValue){
         // predictedValue[co, pm25]
-        
+        await resultPrediction.create({
+          jenis:"prediction",
+          value:{
+            co: parseFloat(predictedValue[1]).toFixed(2),
+            pm25: parseFloat(predictedValue[0]).toFixed(2)
+          },
+          createdAt: time
+        });
         const newDataPoint = new dataset({
           value: {
             co: parseFloat(readyPredict[1]),

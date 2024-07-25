@@ -164,9 +164,9 @@
     <footer class="text-white py-3">
       
       <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Home</a></li>
-        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Contacts</a></li>
-        <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">About</a></li>
+        <li class="nav-item"><a href="/" class="text-white nav-link px-2 text-muted">Home</a></li>
+        <li class="nav-item"><a href="/contact" class="text-white nav-link px-2 text-muted">Contacts</a></li>
+        <li class="nav-item"><a href="/about" class="text-white nav-link px-2 text-muted">About</a></li>
       </ul>
       <p class="text-white text-center text-muted">© 2024 AIRMIND, Inc</p>
       
@@ -194,8 +194,8 @@
       const response = await fetch(`/getPrediction`);
       const dataPredict = await response.json();
 
-      const coPrediction = parseFloat(dataPredict[0].value).toFixed(2);
-      const pm25Prediction = parseFloat(dataPredict[1].value).toFixed(2);
+      const coPrediction = parseFloat(dataPredict.value.co).toFixed(2);
+      const pm25Prediction = parseFloat(dataPredict.value.pm25).toFixed(2);
 
       document.getElementById('predictionCO').innerText = coPrediction;
       document.getElementById('predictionPM25').innerText = pm25Prediction;

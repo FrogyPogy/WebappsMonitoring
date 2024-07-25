@@ -1,62 +1,64 @@
 <main class="main users chart-page" id="skip-target">
-    <div class="container md">
-      <h2 class="main-title">Evaluation Model</h2>
-      <p class="poppins-light nb">*Evaluasi model dilakukan menggunakan MAPE (Mean Average Percentage Error)
-        dengan 20 data uji*
-      </p>
-      <% if (success_msg) { %>
-        <p class="success-alert"><%= success_msg %></p>
-      <% } %>
-      <% if (error_msg) { %>
-          <p class="fail-alert"><%= error_msg %></p>
-      <% } %>
-      <% if (models.length > 0) { %>
-      <div class="users-table table-wrapper">
-        <table class="posts-table">
-          <thead>
-            <tr class="users-table-info">
-              <th>
-                <label class="users-table__checkbox">
-                  <p>#</p>
-                </label>
-              </th>
-              <th>Jenis Model</th>
-              <th>Last Trained</th>
-              <th>Performance</th>
-              <th>Evaluation</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% models.forEach((model, idx) => { %>
-            <tr>
-              <td><%= idx + 1 %></td>
-              <td><%= model.name %></td>
-              <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
-              <td><%= model.performance %></td>
-              <td><button class="rounded-4 btn btn-primary btn-sm signBtn evaluate-btn" data-id="<%= model._id %>" data-name="<%= model.name %>">
-                <span><i class="bi bi-graph-up"></i></span> Evaluate
-              </button></td>
-
-              <td><button class="rounded-4 btn btn-danger btn-sm delete-btn" data-id="<%= model._id %>">
-                <span><i class="bi bi-trash3-fill"></i></span> Delete
-              </button></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-        <% }else { %>
-          <p>No models available</p>
+    <div class="container">
+      <div class="mx-auto col-lg-10">
+        <h2 class="main-title">Evaluation Model</h2>
+        <p class="poppins-light nb">*Evaluasi model dilakukan menggunakan MAPE (Mean Average Percentage Error)
+          dengan 20 data uji*
+        </p>
+        <% if (success_msg) { %>
+          <p class="success-alert"><%= success_msg %></p>
         <% } %>
+        <% if (error_msg) { %>
+            <p class="fail-alert"><%= error_msg %></p>
+        <% } %>
+        <% if (models.length > 0) { %>
+        <div class="users-table table-wrapper">
+          <table class="posts-table">
+            <thead>
+              <tr class="users-table-info">
+                <th>
+                  <label class="users-table__checkbox">
+                    <p>#</p>
+                  </label>
+                </th>
+                <th>Jenis Model</th>
+                <th>Last Trained</th>
+                <th>Performance</th>
+                <th>Evaluation</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% models.forEach((model, idx) => { %>
+              <tr>
+                <td><%= idx + 1 %></td>
+                <td><%= model.name %></td>
+                <td><%= new Date(model.lastTrainedAt).toLocaleString() %></td>
+                <td><%= model.performance %></td>
+                <td><button class="rounded-4 btn btn-primary btn-sm signBtn evaluate-btn" data-id="<%= model._id %>" data-name="<%= model.name %>">
+                  <span><i class="bi bi-graph-up"></i></span> Evaluate
+                </button></td>
+
+                <td><button class="rounded-4 btn btn-danger btn-sm delete-btn" data-id="<%= model._id %>">
+                  <span><i class="bi bi-trash3-fill"></i></span> Delete
+                </button></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <% }else { %>
+            <p>No models available</p>
+          <% } %>
+        </div>
       </div>
     </div>
 </main>
 <footer class="text-white py-3">
       
   <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-    <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Home</a></li>
-    <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">Contacts</a></li>
-    <li class="nav-item"><a href="#" class="text-white nav-link px-2 text-muted">About</a></li>
+    <li class="nav-item"><a href="/" class="text-white nav-link px-2 text-muted">Home</a></li>
+    <li class="nav-item"><a href="/contact" class="text-white nav-link px-2 text-muted">Contacts</a></li>
+    <li class="nav-item"><a href="/about" class="text-white nav-link px-2 text-muted">About</a></li>
   </ul>
   <p class="text-white text-center text-muted">© 2024 AIRMIND, Inc</p>
   

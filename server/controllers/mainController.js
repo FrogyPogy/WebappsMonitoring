@@ -36,6 +36,14 @@ exports.about = async(req, res) => {
     res.render('about', locals);
 };
 
+exports.contact = async (req, res) => {
+  const locals = {
+    title:'Contact - AIRMIND',
+    description:'Air Pollution Monitoring and Prediction System'
+  }
+  res.render('contact', locals);
+}
+
 exports.initializeData = async (req, res) => {
     try {
       // Ambil 100 data awal dari ThingSpeak
@@ -73,6 +81,21 @@ exports.initializeData = async (req, res) => {
       res.status(500).json({ error: 'Terjadi kesalahan saat menyimpan data awal' });
     }
   };
+exports.updateModel = async (req, res) => {
+  try{
+    const lastDataset = await dataset.find({}).sort({ timestamp: 1 }).limit(100);
+    await regressionModel.firstTrainPM25(lastDataset);
+    await regressionModel.firstTrain(lastDataset);
+
+    req.flash('success_msg', 'new model trainde successfully');
+    res.redirect('/prediction');
+
+  }catch(error){
+    req.flash('error_msg', 'fail to train new model');
+    res.redirect('/prediction');
+  }
+}
+
 exports.initializeModel = async (req, res) => {
   try{
     //cek apakah resultModel kosong?
@@ -88,7 +111,7 @@ exports.initializeModel = async (req, res) => {
     await regressionModel.firstTrainPM25(firstDataset);
     await regressionModel.firstTrain(firstDataset);
   
-    req.flash('success_msg', 'model trained successfully');
+    req.flash('success_msg', 'initial model trained successfully');
     res.redirect('/prediction'); //rendering index.ejs in views
   }catch(error){
     req.flash('error_msg', 'fail to train model');
@@ -96,8 +119,6 @@ exports.initializeModel = async (req, res) => {
     // res.status(500).json({error: 'terjadi kesalahan saat melakukan initialize model'});
   }
 };
-
-
 
 //formatDate
 //untuk memformat tipe data waktu menjadi hari dan jam
@@ -124,10 +145,8 @@ exports.getData = async (req, res) => {
 
 exports.getPrediction = async (req, res) => {
   try{
-    const lastPrediction = await Promise.all([
-      resultPrediction.findOne({ jenis: 'CO' }).sort({ createdAt: -1 }),
-      resultPrediction.findOne({ jenis: 'PM25' }).sort({ createdAt: -1 })
-    ]);
+    const lastPrediction = await resultPrediction.findOne({}).sort({ createdAt: -1 })
+
     res.json(lastPrediction);
   }catch(error){
     req.flash('error_msg', 'Belum ada model prediksi');

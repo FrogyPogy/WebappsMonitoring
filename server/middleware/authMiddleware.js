@@ -9,6 +9,7 @@ const requireAuth = (req, res, next) => {
                 console.log(error.message);
                 res.redirect('/signIn');
             }else{
+                req.user = decodedToken;
                 console.log(decodedToken);
                 next();
             }
