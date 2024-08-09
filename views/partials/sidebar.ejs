@@ -18,7 +18,7 @@
         <div class="sidebar-body">
             <ul class="sidebar-body-menu">
                 <li>
-                    <a class="active" href="/admin"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
+                    <a href="/admin"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
                 </li>
                 <li>
                     <a href="/prediction">
@@ -57,3 +57,21 @@
         </a>
     </div>
 </aside>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Dapatkan URL saat ini
+        var currentUrl = window.location.pathname;
+    
+        // Iterasi setiap link di sidebar
+        $('.sidebar-body-menu a').each(function () {
+            // Cek apakah href dari link cocok dengan URL saat ini
+            if ($(this).attr('href') === currentUrl) {
+                // Hapus kelas active dari elemen lain
+                $('.sidebar-body-menu a').removeClass('active');
+                // Tambahkan kelas active ke elemen yang sesuai
+                $(this).addClass('active');
+            }
+        });
+    });
+    </script>

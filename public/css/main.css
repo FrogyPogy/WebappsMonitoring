@@ -16,11 +16,12 @@
 
 footer ul{
     list-style: none;
-    
+}
+.footer-font{
+    color: rgb(70, 70, 70);
 }
 
 footer ul li a{
-    color: white;
     text-decoration: none;
 }
 .overlay-container{/*Kotak transparan pada background utama*/
@@ -46,12 +47,67 @@ footer ul li a{
     justify-content: center;
 }
 .bg-second{
+    background-color: rgba(242, 252, 237, 0.8);
     position: relative; /* Menggunakan posisi absolut untuk menempatkan teks */
     z-index: 1;
     margin-top: -20vh;
-    padding-top: 20vh;
-   
+    padding-top: 20vh;  
 }
+.container-about {
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.content-text {
+    line-height: 2.0; /* Line spacing */
+    margin-bottom: 1.5em; /* Paragraph spacing */
+    text-align: justify;
+}
+
+.bg-third {
+    background-color: rgba(242, 252, 237, 0.8);
+    position: relative;
+    z-index: 1;
+    padding-top: 20vh;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.about-font{
+    color: rgb(40, 40, 40);
+    text-shadow: rgb(68, 68, 68);
+    text-align: center;
+}
+.about-image {
+    background-size: cover;
+    background-position: center;
+    height: 300px; /* Atur tinggi sesuai kebutuhan */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+.centered-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Menjaga rasio gambar */
+}
+
+.rounded-frame {
+    border: 1px solid #ccc; /* Warna dan ketebalan frame */
+    border-radius: 15px; /* Sudut melengkung */
+    padding: 5px; /* Ruang antara gambar dan frame */
+}
+
+
+
 .fail-alert{
     color: #fb4143;
     font-family: sans-serif;
@@ -169,15 +225,15 @@ url image sebagai berikut:
 }
 
 .info-box.red .icon-container {
-    background-image: url('/img/svg/co-red.png'); /* Merah (Tidak Sehat) */
+    background-image: url('/img/pollution/co-red.png'); /* Merah (Tidak Sehat) */
 }
 
 .info-box.purple .icon-container {
-    background-image: url('/img/svg/co-purple.png'); /* Ungu (Sangat Tidak Sehat) */
+    background-image: url('/img/pollution/co-purple.png'); /* Ungu (Sangat Tidak Sehat) */
 }
 
 .info-box.maroon .icon-container {
-    background-image: url('/img/svg/co-maroon.png'); /* Maroon (Berbahaya) */
+    background-image: url('/img/pollution/co-maroon.png'); /* Maroon (Berbahaya) */
 }
 
 .info-box.greenPM .icon-container {
