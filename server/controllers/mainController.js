@@ -24,7 +24,7 @@ exports.homepage = async(req, res) => {  //Menerapkan langsung fungsi ke objek e
     res.render('index', locals); //rendering index.ejs in views
   }catch (error){
     console.error('Terjadi kesalahan saat memuat halaman utama:', error);
-    res.status(500).render('error',{message:'Terjadi kesalahan saat memuat halaman utama'});
+    res.status(500).render('500',{message:'Terjadi kesalahan saat memuat halaman utama'});
   }
 };
 
