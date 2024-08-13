@@ -17,6 +17,7 @@
 footer ul{
     list-style: none;
 }
+
 .footer-font{
     color: rgb(70, 70, 70);
 }
@@ -249,15 +250,15 @@ url image sebagai berikut:
 }
 
 .info-box.redPM .icon-container {
-    background-image: url('/img/svg/co-red.png'); /* Merah (Tidak Sehat) */
+    background-image: url('/img/pollution/pm25-red.png'); /* Merah (Tidak Sehat) */
 }
 
 .info-box.purplePM .icon-container {
-    background-image: url('/img/svg/co-purple.png'); /* Ungu (Sangat Tidak Sehat) */
+    background-image: url('/img/pollution/pm25-purple.png'); /* Ungu (Sangat Tidak Sehat) */
 }
 
 .info-box.maroonPM .icon-container {
-    background-image: url('/img/svg/co-maroon.png'); /* Maroon (Berbahaya) */
+    background-image: url('/img/pollution/pm25-maroon.png'); /* Maroon (Berbahaya) */
 }
 
 @media (min-width: 768px){

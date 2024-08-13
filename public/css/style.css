@@ -3075,11 +3075,10 @@ label {
 }
 
 .footer {
-  border-top: 1px solid #E0E1EA;
-  padding-top: 14px;
-  padding-bottom: 14px;
+  padding-top: 20px;
+  padding-bottom: 0px;
   color: #b9b9b9;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .footer--flex {
