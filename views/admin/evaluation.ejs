@@ -11,6 +11,10 @@
             <p class="fail-alert"><%= error_msg %></p>
         <% } %>
         <% if (models.length > 0) { %>
+        <!-- Alert Bootstrap -->
+        <div id="alert-container2" class="container mt-3">
+        <!--Alert pop up-->
+        </div>
         <div class="users-table table-wrapper">
           <table class="posts-table">
             <thead>
@@ -51,7 +55,26 @@
         </div>
       </div>
     </div>
-    
+    <!-- Modal Konfirmasi Hapus -->
+    <div class="modal fade" id="deleteModelModal" tabindex="-1" aria-labelledby="deleteModelModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteConfirmationModalLabel">Konfirmasi Penghapusan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Yakin ingin menghapus data?.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteModel1">
+              <span><i class="bi bi-trash3-fill"></i></span> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 </main>
 <footer class="bg-light text-center text-white footer">
   <!-- Grid container -->
@@ -74,65 +97,81 @@
 <script src="/js/script.js"></script>
 
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    let modelIdToDelete = null;
 
-  document.querySelectorAll('.evaluate-btn').forEach(button => {
+    document.querySelectorAll('.evaluate-btn').forEach(button => {
+        button.addEventListener('click', async function(event) {
+          event.preventDefault();
+          const modelName = this.getAttribute('data-name');
+          const modelId = this.getAttribute('data-id');
+
+          try {
+            const response = await fetch('/runEvaluation', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ modelId, modelName })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              alert('Evaluation completed successfully');
+              console.log(result.predictions); // Atau tampilkan hasil di halaman
+            } else {
+              alert(result.error);
+            }
+          } catch (error) {
+            console.error('Error during evaluation:', error);
+            alert('An error occurred during evaluation');
+          }
+        });
+    });
+    document.querySelectorAll('.delete-btn').forEach(button => {
       button.addEventListener('click', async function(event) {
         event.preventDefault();
-        const modelName = this.getAttribute('data-name');
-        const modelId = this.getAttribute('data-id');
-
-        try {
-          const response = await fetch('/runEvaluation', {
-            method: 'POST',
+        modelIdToDelete = this.getAttribute('data-id');
+        //Tampilkan modal konfirmasi delete
+        const myModal = new bootstrap.Modal(document.getElementById('deleteModelModal'));
+        myModal.show();
+      })
+    });
+    document.getElementById('confirmDeleteModel1').addEventListener('click', async function() {
+      if (!modelIdToDelete) return;
+      try{
+          const response = await fetch('/deleteModel', {
+            method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ modelId, modelName })
+            body: JSON.stringify({ modelId: modelIdToDelete }) 
           });
+          // Debug: Log the raw response before parsing as JSON
+          const text = await response.text();
+          console.log('Raw response:', text);
 
-          const result = await response.json();
-          if (response.ok) {
-            alert('Evaluation completed successfully');
-            console.log(result.predictions); // Atau tampilkan hasil di halaman
-          } else {
-            alert(result.error);
-          }
-        } catch (error) {
-          console.error('Error during evaluation:', error);
-          alert('An error occurred during evaluation');
-        }
-      });
-    });
-  document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', async function(event) {
-      event.preventDefault();
-      const modelId = this.getAttribute('data-id');
-
-      try{
-        const response = await fetch('/deleteModel', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ modelId }) 
-        });
-         // Debug: Log the raw response before parsing as JSON
-        const text = await response.text();
-        console.log('Raw response:', text);
-
-        const result = JSON.parse(text);
-          if (response.ok) {
-            alert('Delete model successfully');
-            location.reload();
-          } else {
-            alert(result.error);
-          }
-
+          const result = JSON.parse(text);
+            if (response.ok) {
+              showAlert('Delete model successfully','success');
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              showAlert(result.error, 'danger');
+            }
       }catch(error){
         console.error('Error during delete model:', error);
-        alert('An error occurred during delete model');
+        showAlert('An error occurred during delete model','danger');
       }
-    })
+    });
+    function showAlert(message, type) {
+      const alertContainer = document.getElementById('alert-container2');
+      alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    }
   });
 </script>
 

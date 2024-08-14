@@ -8,7 +8,7 @@ const resultPrediction = require('../models/resultPrediction');
 module.exports = {
     start: () => {
         //melakukan scheduling setiap satu jam utk ambil dan prediksi data
-        cron.schedule('12 * * * *', updateAndPredict);
+        cron.schedule('0 * * * *', updateAndPredict);
         //melakukan scheduling setiap 3 hari sekali untuk updateModel Regresi 
         // cron.schedule('0 0 */3 * *', regressionModel.updateRegressionModel);
     },

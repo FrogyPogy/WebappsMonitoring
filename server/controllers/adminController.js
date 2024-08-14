@@ -230,7 +230,7 @@ exports.displayPrediction = async (req, res) => {
             return d1.getFullYear() === d2.getFullYear() &&
                    d1.getMonth() === d2.getMonth() &&
                    d1.getDate() === d2.getDate() &&
-                   d1.getHours() === d2.getHours(); //karena hasil prediksi merupakan data untuk satu jam kedepan
+                   d1.getHours() === d2.getHours()-1; //karena hasil prediksi merupakan data untuk satu jam kedepan
         };
 
         // Gabungkan data prediksi dan data aktual berdasarkan tanggal dan jam
