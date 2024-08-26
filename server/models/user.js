@@ -20,7 +20,9 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minLength: [8, 'minimum password length is 8 character']
-    }
+    },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
 });
 
 //use presave hook

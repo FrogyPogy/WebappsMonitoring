@@ -23,6 +23,15 @@ router.get('/updateModel', requireAuth, mainController.updateModel);
 //Route signIn
 router.get('/signIn',loginController.signInPage);
 router.post('/signIn',loginController.checkAuth);
+//Route Forgotpassword
+router.get('/forgot-password', loginController.forgotPasswordPage);
+router.post('/forgot-password', loginController.forgotPassword);
+router.post('/reset-password/:token', loginController.resetPassword);
+router.get('/reset-password/:token', (req, res) => {
+    const token = req.params.token;
+    // Proses token reset password, misalnya verifikasi token
+    res.render('resetPassword', { token });
+});
 //Route signUp
 router.post('/signUp',loginController.createUser);
 router.get('/signUp',loginController.signUpPage);
