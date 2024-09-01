@@ -1,8 +1,8 @@
 function hideShow(){
     var x = document.getElementById("predictionContent");
-    if (x.style.display = "none"){
+    if (x.style.display === "none"){
         x.style.display = "block";
-    }else if(x.style.display = "block"){
+    }else{
         x.style.display = "none";
     }
 }

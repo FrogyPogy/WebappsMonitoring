@@ -12,8 +12,6 @@ module.exports = {
               temperature saat ini dan windspeed saat ini dalam bentuk
               array 1D misal [16, 3, 5, 50, 30, 2]
           */
-          // Coba memuat model regresi dari database resultModel
-          console.log('posisi di fungsi predictAirPollution dengan data, ', data);
           const fetchModelCO = await resultModel.findOne({ name: 'modelCO' }).sort({ lastTrainedAt: -1 }).limit(1);
           const fetchModelPM25 = await resultModel.findOne({ name: 'modelPM25' }).sort({ lastTrainedAt: -1 }).limit(1);
           
