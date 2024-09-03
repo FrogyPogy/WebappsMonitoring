@@ -29,7 +29,7 @@ router.post('/forgot-password', loginController.forgotPassword);
 router.post('/reset-password/:token', loginController.resetPassword);
 router.get('/reset-password/:token', (req, res) => {
     const token = req.params.token;
-    // Proses token reset password, misalnya verifikasi token
+    // Proses token reset password
     res.render('resetPassword', { token });
 });
 //Route signUp

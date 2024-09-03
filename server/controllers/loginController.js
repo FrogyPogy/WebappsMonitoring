@@ -108,7 +108,9 @@ exports.forgotPassword = async (req, res) => {
         const users = await user.findOne({ email });
   
         if (!users) {
-            return res.status(400).json({ message: 'Email not found' });
+            req.flash('error_msg', 'Email not Found');
+            res.redirect('/forgot-password');
+            // return res.status(400).json({ message: 'Email not found' });
         }
   
         // Generate token
@@ -139,10 +141,11 @@ exports.forgotPassword = async (req, res) => {
   
         await transporter.sendMail(mailOptions);
   
-        res.status(200).json({ message: 'Password reset email sent' });
-  
+        req.flash('success_msg', 'Password reset email sent');
+        res.redirect('/forgot-password');
     } catch (error) {
-        res.status(500).json({ message: 'Error in sending email', error });
+        req.flash('error_msg', 'Error in sending email');
+        res.redirect('/forgot-password');
     }
   };
 
@@ -160,20 +163,17 @@ exports.forgotPassword = async (req, res) => {
             return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
         }
 
-        // Hash the new password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         // Save the new password
-        users.password = hashedPassword;
+        users.password = password;
         users.resetPasswordToken = undefined;
         users.resetPasswordExpires = undefined;
 
         await users.save();
 
-        res.status(200).json({ message: 'Password has been updated' });
+        res.redirect('/signIn');
 
     } catch (error) {
-        res.status(500).json({ message: 'Error in resetting password', error });
+        req.flash('error_msg', 'Error in resetting password');
+        res.render('resetPassword', { token });
     }
 };
