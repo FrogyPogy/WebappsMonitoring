@@ -68,15 +68,15 @@ async function updateAndPredict(){
         await resultPrediction.create({
           jenis:"prediction",
           value:{
-            co: parseFloat(predictedValue[1]).toFixed(2),
-            pm25: parseFloat(predictedValue[0]).toFixed(2)
+            co: parseFloat(predictedValue[0]).toFixed(2),
+            pm25: parseFloat(predictedValue[1]).toFixed(2)
           },
           createdAt: time
         });
         const newDataPoint = new dataset({
           value: {
-            co: parseFloat(readyPredict[1]),
-            pm25: parseFloat(readyPredict[2]),
+            co: parseFloat(readyPredict[2]),
+            pm25: parseFloat(readyPredict[1]),
             temperature: parseFloat(readyPredict[3]),
             humidity: parseFloat(readyPredict[4]),
             windSpeed: parseFloat(readyPredict[5])

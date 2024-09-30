@@ -145,7 +145,7 @@ exports.forgotPassword = async (req, res) => {
         res.redirect('/forgot-password');
     } catch (error) {
         req.flash('error_msg', 'Error in sending email');
-        res.redirect('/forgot-password');
+        res.render('forgotPassword');
     }
   };
 
