@@ -50,9 +50,9 @@ app.use('/', require('./server/routes/index'));
 app.get('*', function(req, res){
     res.status(404).render('404')
 });
-//Jika deploy ke vercel tanpa listen port
-// app.listen(port, () => {
-//     console.log(`App Listening on port ${port}`);
-//     schedule.start();
-// });
-module.exports = app;
+//Jika deploy ke vercel tanpa listen port maka hapus listen port dan schedule
+app.listen(port, () => {
+    console.log(`App Listening on port ${port}`);
+    schedule.start();
+});
+// module.exports = app;
